@@ -28,7 +28,7 @@ func (r Repository) SaveInBd(date time.Time, timesOfDay, temp, weather, pressure
 
 func (r Repository) RegistrUser(messageinfo *model.Message) {
 	rows, err := r.db.Query("SELECT *From Users where chatid = $1", messageinfo.ChatID)
-	if rows != nil {
+	if rows.Next() {
 		return
 	}
 	_, err = r.db.Exec("INSERT INTO Users(chatid, username, city, first_name, last_name) VALUES($1, $2, $3, $4, $5)",
@@ -50,7 +50,7 @@ func (r Repository) CityChange(city string, chatid int64) {
 func (r Repository) ClearDb() {
 	_, err := r.db.Exec("DELETE FROM weather_forecast")
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }
 

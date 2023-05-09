@@ -4,6 +4,7 @@ import (
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/parse"
 	"github.com/Fluffi1235/vkcontest/internal/service"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -24,7 +25,10 @@ func CheckCity(msg string, chatId int64, servise *service.Repository) (bool, str
 	var city string
 	var answer string
 	for k, _ := range citys {
-		checkprefday, _ := regexp.MatchString("city .+", msg)
+		checkprefday, err := regexp.MatchString("city .+", msg)
+		if err != nil {
+			log.Println(err)
+		}
 		if checkprefday {
 			city = strings.Split(msg, "city ")[1]
 			if city == k {
@@ -41,7 +45,10 @@ func CheckCity(msg string, chatId int64, servise *service.Repository) (bool, str
 
 func CheckNdays(msg string, chatId int64, servise *service.Repository) (bool, []string) {
 	answermas := make([]string, 0)
-	checkprefinterval, _ := regexp.MatchString("Погода \\d{1,10}", msg)
+	checkprefinterval, err := regexp.MatchString("Погода \\d{1,10}", msg)
+	if err != nil {
+		log.Println(err)
+	}
 	if checkprefinterval {
 		msgsplit := strings.Split(msg, " ")
 		answermas = servise.GetWeatherByNDays(msgsplit[1], chatId)
@@ -51,7 +58,10 @@ func CheckNdays(msg string, chatId int64, servise *service.Repository) (bool, []
 }
 
 func Calculator(msg string, chatId int64, person map[int64]rune) bool {
-	checkprefinterval, _ := regexp.MatchString("calc [-+*/]", msg)
+	checkprefinterval, err := regexp.MatchString("calc [-+*/]", msg)
+	if err != nil {
+		log.Println(err)
+	}
 	if checkprefinterval {
 		symbol := msg[len(msg)-1]
 		person[chatId] = rune(symbol)
@@ -63,7 +73,10 @@ func Calculator(msg string, chatId int64, person map[int64]rune) bool {
 func isTwoNumbers(msg string, chatId int64, person map[int64]rune) string {
 	var rez float64
 	var answer string
-	checkprefinterval, _ := regexp.MatchString("[-]?\\d+ [-]?\\d+", msg)
+	checkprefinterval, err := regexp.MatchString("[-]?\\d+ [-]?\\d+", msg)
+	if err != nil {
+		log.Println(err)
+	}
 	if checkprefinterval {
 		msgsplit := strings.Split(msg, " ")
 		num1, _ := strconv.Atoi(msgsplit[0])
@@ -92,7 +105,10 @@ func isTwoNumbers(msg string, chatId int64, person map[int64]rune) string {
 
 func CalFruit(msg string) (bool, string) {
 	var answer string
-	checkprefdata, _ := regexp.MatchString("apiFruit .+", msg)
+	checkprefdata, err := regexp.MatchString("apiFruit .+", msg)
+	if err != nil {
+		log.Println(err)
+	}
 	if checkprefdata {
 		msgsplit := strings.Split(msg, " ")
 		fruitinfo := parse.ParseFruit(msgsplit[1])
@@ -110,7 +126,10 @@ func CalFruit(msg string) (bool, string) {
 
 func Btc(msg string) (bool, string) {
 	var answer string
-	checkprefBtc, _ := regexp.MatchString("BTC/USD", msg)
+	checkprefBtc, err := regexp.MatchString("BTC/USD", msg)
+	if err != nil {
+		log.Println(err)
+	}
 	if checkprefBtc {
 		answer = parse.ParseBtc()
 		return true, answer

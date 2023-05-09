@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"errors"
-	"fmt"
 	"github.com/Fluffi1235/vkcontest/internal/bot"
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/parse"
@@ -26,11 +24,11 @@ func LoadConfigFromYaml() (*Config, error) {
 	var conf Config
 	f, err := ioutil.ReadFile("./config/config.yaml")
 	if err != nil {
-		return nil, errors.New("Can't read configs file")
+		return nil, err
 	}
 	err = yaml.Unmarshal(f, &conf)
 	if err != nil {
-		fmt.Println("Error read file")
+		return nil, err
 	}
 	return &conf, nil
 }
@@ -38,13 +36,11 @@ func LoadConfigFromYaml() (*Config, error) {
 func main() {
 	config, err := LoadConfigFromYaml()
 	if err != nil {
-		fmt.Print("Error load configs")
-	} else {
-		fmt.Println("Config read successfully")
+		log.Fatal(err)
 	}
 	db, err := sql.Open("postgres", config.ConnectDb)
 	if err != nil {
-		log.Fatalln("Error connecting to DB", err)
+		log.Fatal(err)
 	}
 	defer db.Close()
 

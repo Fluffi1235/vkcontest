@@ -27,15 +27,15 @@ func (p *Parser) ParsWeather() {
 		for key, value := range citilink {
 			res, err := http.Get(value)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 			defer res.Body.Close()
 			if res.StatusCode != 200 {
-				log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+				log.Println("status code error: %d %s", res.StatusCode, res.Status)
 			}
 			doc, err := goquery.NewDocumentFromReader(res.Body)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 			date := time.Now()
 			var k int

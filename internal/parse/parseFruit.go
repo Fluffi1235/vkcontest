@@ -28,7 +28,7 @@ func ParseFruit(msg string) Nutrit {
 	defer resp.Body.Close()
 	err = json.NewDecoder(resp.Body).Decode(&fruit)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	return fruit.Nutritions
 }
