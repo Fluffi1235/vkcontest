@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/Fluffi1235/vkcontest/internal/service"
 	"github.com/Fluffi1235/vkcontest/internal/sources"
 	"log"
@@ -20,35 +21,36 @@ func NewBot(m map[model.SourceType]sources.Source) Bot {
 	}
 }
 
-func (b *Bot) RunBot(ctx context.Context, wg *sync.WaitGroup) {
+func (b *Bot) RunBot(ctx context.Context, wg *sync.WaitGroup, repo repository.UniversalRepo) {
 	msgChan := make(chan *model.Message)
 
 	for _, source := range b.Sources {
 		go source.Read(ctx, msgChan)
 	}
 
-	b.HandlingMessage(msgChan)
+	b.HandlingMessage(msgChan, repo)
 
 	close(msgChan)
 	wg.Done()
 }
 
-func (b *Bot) HandlingMessage(msgChan <-chan *model.Message) {
+func (b *Bot) HandlingMessage(msgChan <-chan *model.Message, repo repository.UniversalRepo) {
+	service := service.New(repo)
 	mpperson := make(map[int64]rune, 0)
 	var answer string
 	for msg := range msgChan {
 		if msg.Button != nil {
 			log.Printf("Нажата кнопка с данными: %s\n", msg.Button.Data)
 
-			if funcResponse, answerdata := DataUser(msg.Button.Data, msg.ChatID); funcResponse {
+			if funcResponse, answerdata := DataUser(msg.Button.Data, msg.ChatID, service); funcResponse {
 				b.Sources[msg.Source].EditMessage(answerdata, msg.ChatID, msg.Button.Message.MessageID)
 			}
 
-			if funcResponse, answercity := CheckCity(msg.Button.Data, msg.ChatID); funcResponse {
+			if funcResponse, answercity := CheckCity(msg.Button.Data, msg.ChatID, service); funcResponse {
 				b.Sources[msg.Source].EditMessage(answercity, msg.ChatID, msg.Button.Message.MessageID)
 			}
 
-			if funcResponse, answermasNday := CheckNdays(msg.Button.Data, msg.ChatID); funcResponse {
+			if funcResponse, answermasNday := CheckNdays(msg.Button.Data, msg.ChatID, service); funcResponse {
 				for i := 1; i < len(answermasNday); i++ {
 					answer = answer + answermasNday[i]
 					if i%4 == 0 && i < 5 {
@@ -99,7 +101,7 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message) {
 
 			switch message {
 			case "/start":
-				service.RegistrUser(msg)
+				repo.RegistrUser(msg)
 				answer = service.AnswerStart()
 				b.Sources[msg.Source].Send(answer, msg.ChatID)
 			case "/info":

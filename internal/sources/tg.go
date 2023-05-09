@@ -3,7 +3,6 @@ package sources
 import (
 	"context"
 	"github.com/Fluffi1235/vkcontest/internal/model"
-	"github.com/Fluffi1235/vkcontest/resources"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 )
@@ -23,8 +22,8 @@ type TG struct {
 	CharID int64
 }
 
-func NewTG() Source {
-	bot, err := tgbotapi.NewBotAPI(resources.Token)
+func NewTG(token string) Source {
+	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Panic(err)
 	}

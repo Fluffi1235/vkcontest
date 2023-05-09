@@ -1,9 +1,9 @@
 FROM postgres:latest
 
-ENV POSTGRES_USER fluffi
-ENV POSTGRES_PASSWORD nedji240696
-ENV POSTGRES_DB universalbot
+ENV POSTGRES_USER
+ENV POSTGRES_PASSWORD
+ENV POSTGRES_DB
 
 COPY init.sql /docker-entrypoint-initdb.d/
 
-EXPOSE 32768
+EXPOSE

@@ -1,0 +1,2 @@
+connectdb: "host=localhost port= user= password= dbname= sslmode=disable"
+tgtoken: "tgtoken"

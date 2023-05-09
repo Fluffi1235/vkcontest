@@ -9,17 +9,17 @@ import (
 	"strings"
 )
 
-func DataUser(msg string, chatId int64) (bool, string) {
+func DataUser(msg string, chatId int64, servise *service.Repository) (bool, string) {
 	var answer string
 	checkprefdata, _ := regexp.MatchString("Показать мои данные", msg)
 	if checkprefdata {
-		answer = service.GetUserData(chatId)
+		answer = servise.GetUserCity(chatId)
 		return true, answer
 	}
 	return false, answer
 }
 
-func CheckCity(msg string, chatId int64) (bool, string) {
+func CheckCity(msg string, chatId int64, servise *service.Repository) (bool, string) {
 	citys := model.City()
 	var city string
 	var answer string
@@ -28,8 +28,8 @@ func CheckCity(msg string, chatId int64) (bool, string) {
 		if checkprefday {
 			city = strings.Split(msg, "city ")[1]
 			if city == k {
-				answer = service.AnswerForCityChange(city)
-				service.SaveCity(k, chatId)
+				answer = servise.AnswerForCityChange(city)
+				servise.SaveCity(k, chatId)
 				return true, answer
 			} else {
 				answer = "Информации о погоде об этом городе нет"
@@ -39,12 +39,12 @@ func CheckCity(msg string, chatId int64) (bool, string) {
 	return false, answer
 }
 
-func CheckNdays(msg string, chatId int64) (bool, []string) {
+func CheckNdays(msg string, chatId int64, servise *service.Repository) (bool, []string) {
 	answermas := make([]string, 0)
 	checkprefinterval, _ := regexp.MatchString("Погода \\d{1,10}", msg)
 	if checkprefinterval {
 		msgsplit := strings.Split(msg, " ")
-		answermas = service.GetWeatherByNDays(msgsplit[1], chatId)
+		answermas = servise.GetWeatherByNDays(msgsplit[1], chatId)
 		return true, answermas
 	}
 	return false, answermas

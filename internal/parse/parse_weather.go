@@ -2,7 +2,7 @@ package parse
 
 import (
 	"github.com/Fluffi1235/vkcontest/internal/model"
-	"github.com/Fluffi1235/vkcontest/internal/service"
+	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
@@ -10,9 +10,19 @@ import (
 	"time"
 )
 
-func ParsWeather() {
+type Parser struct {
+	repo repository.UniversalRepo
+}
+
+func New(repo repository.UniversalRepo) *Parser {
+	return &Parser{
+		repo: repo,
+	}
+}
+
+func (p *Parser) ParsWeather() {
 	for {
-		service.ClearDb()
+		p.repo.ClearDb()
 		citilink := model.City()
 		for key, value := range citilink {
 			res, err := http.Get(value)
@@ -40,7 +50,7 @@ func ParsWeather() {
 				timesOfDay := strings.Split(temp, ",")[0]
 				temp = strings.Split(temp, ",")[1]
 				counter++
-				service.SaveInBd(date.AddDate(0, 0, k), timesOfDay, temp, weather, pressure, humidity, windspeed, felt, key)
+				p.repo.SaveInBd(date.AddDate(0, 0, k), timesOfDay, temp, weather, pressure, humidity, windspeed, felt, key)
 				if counter == 4 {
 					k++
 					counter = 0
