@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"telegram_bot/internal/model"
-	"telegram_bot/internal/service"
 	"time"
+	"vkcontest/internal/model"
+	"vkcontest/internal/service"
 )
 
 func ParsWeather() {

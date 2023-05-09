@@ -1,4 +1,4 @@
-module telegram_bot
+module vkcontest
 
 go 1.17
 
@@ -6,7 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/SevereCloud/vksdk/v2 v2.16.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
-	github.com/lib/pq v1.10.7
+	github.com/lib/pq v1.10.9
 )
 
 require (

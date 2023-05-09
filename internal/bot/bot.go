@@ -5,9 +5,9 @@ import (
 	"log"
 	"strings"
 	"sync"
-	"telegram_bot/internal/model"
-	"telegram_bot/internal/service"
-	"telegram_bot/internal/sources"
+	"vkcontest/internal/model"
+	"vkcontest/internal/service"
+	"vkcontest/internal/sources"
 )
 
 type Bot struct {
@@ -39,17 +39,16 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message) {
 	for msg := range msgChan {
 		if msg.Button != nil {
 			log.Printf("Нажата кнопка с данными: %s\n", msg.Button.Data)
-			textButton := msg.Button.Data
 
-			if Calculator(msg.Button.Data, msg.ChatID, mpperson) {
-				b.Sources[msg.Source].EditMessage("Введите 2 числа через пробел", msg.ChatID, msg.Button.Message.MessageID)
+			if funcResponse, answerdata := DataUser(msg.Button.Data, msg.ChatID); funcResponse {
+				b.Sources[msg.Source].EditMessage(answerdata, msg.ChatID, msg.Button.Message.MessageID)
 			}
 
-			if a, answercity := CheckCity(msg.Button.Data, msg.ChatID); a == true {
+			if funcResponse, answercity := CheckCity(msg.Button.Data, msg.ChatID); funcResponse {
 				b.Sources[msg.Source].EditMessage(answercity, msg.ChatID, msg.Button.Message.MessageID)
 			}
 
-			if a, answermasNday := CheckNdays(msg.Button.Data, msg.ChatID); a == true {
+			if funcResponse, answermasNday := CheckNdays(msg.Button.Data, msg.ChatID); funcResponse {
 				for i := 1; i < len(answermasNday); i++ {
 					answer = answer + answermasNday[i]
 					if i%4 == 0 && i < 5 {
@@ -62,8 +61,23 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message) {
 					}
 				}
 			}
-			switch textButton {
+
+			if Calculator(msg.Button.Data, msg.ChatID, mpperson) {
+				b.Sources[msg.Source].EditMessage("Введите 2 числа через пробел", msg.ChatID, msg.Button.Message.MessageID)
+			}
+
+			if funcResponse, answerCalFruit := CalFruit(msg.Button.Data); funcResponse {
+				b.Sources[msg.Source].EditMessage(answerCalFruit, msg.ChatID, msg.Button.Message.MessageID)
+			}
+
+			if funcResponse, answerBTC := Btc(msg.Button.Data); funcResponse {
+				b.Sources[msg.Source].EditMessage("Текущий курс BTC/USD: "+answerBTC+"\nДанные были взяты с сайта https://www.coindesk.com/search?s=bitcoin", msg.ChatID, msg.Button.Message.MessageID)
+			}
+
+			switch msg.Button.Data {
 			case "Мои данные":
+				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
+			case "Изменить город":
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
 			case "Прогноз погоды":
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
@@ -73,30 +87,30 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message) {
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
 			case "Калорийность фруктов":
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
-			case "Изменить город":
-				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
 			}
 		}
 		if msg.Text != "" {
 			message := strings.ToLower(msg.Text)
 
-			answer = isTwoNumbers(msg.Text, msg.ChatID, mpperson)
+			answer = isTwoNumbers(message, msg.ChatID, mpperson)
 			if answer != "" {
 				b.Sources[msg.Source].Send(answer, msg.ChatID)
 			}
 
 			switch message {
-
 			case "/start":
 				service.RegistrUser(msg)
-				b.Sources[msg.Source].Send(service.AnswerStart(), msg.ChatID)
-
+				answer = service.AnswerStart()
+				b.Sources[msg.Source].Send(answer, msg.ChatID)
 			case "/info":
-				b.Sources[msg.Source].SendButton("Выберите функцию", msg.ChatID)
-
+				answer = "Выберите функцию"
+				b.Sources[msg.Source].SendButton(answer, msg.ChatID)
 			case "/help":
 				answer = "Чтобы узнать какие команды есть введите /info"
 				b.Sources[msg.Source].Send(answer, msg.ChatID)
+			}
+			if answer == "" {
+				b.Sources[msg.Source].Send("Что то пошло не так, попробуйте еще раз /info", msg.ChatID)
 			}
 		}
 	}

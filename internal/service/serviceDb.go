@@ -5,9 +5,9 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"telegram_bot/internal/dao"
-	"telegram_bot/internal/model"
 	"time"
+	"vkcontest/internal/dao"
+	"vkcontest/internal/model"
 )
 
 func SaveInBd(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string) {
@@ -19,7 +19,7 @@ func RegistrUser(messageinfo *model.Message) {
 }
 
 func SaveCity(city string, chatid int64) {
-	dao.SaveCity(city, chatid)
+	dao.CityChange(city, chatid)
 }
 
 func ClearDb() {
@@ -34,55 +34,6 @@ func GetNameCity(rowcity *sql.Rows) string {
 		}
 	}
 	return city
-}
-
-func GetWeatherByDate(date string, chatid int64) string {
-	weather := model.Weather{}
-	var answer string
-	rowcity := dao.GetUserCity(chatid)
-	defer rowcity.Close()
-	city := GetNameCity(rowcity)
-	rowsweather := dao.WeatherByDate(date, city)
-	defer rowsweather.Close()
-	for rowsweather.Next() {
-		if err := rowsweather.Scan(&weather.Id, &weather.Day, &weather.TimesOfDay, &weather.Temp, &weather.Weather,
-			&weather.Pressure, &weather.Humidity, &weather.Windspeed, &weather.Felt, &weather.City); err != nil {
-			log.Println(err)
-		}
-		weather.TimesOfDay = strings.ToUpper(weather.TimesOfDay)
-		answer = answer + weather.TimesOfDay + "\n" + weather.Temp + ", " + weather.Weather + " Ощущается как " +
-			weather.Felt + "\n" + "Давление = " + weather.Pressure + " мм рт.ст., Влажность = " + weather.Humidity +
-			", Ветер = " + weather.Windspeed + "м/с\n\n"
-	}
-	return answer
-}
-
-func GetWeatherByInterval(firstdate, lastdate string, chatid int64) []string {
-	weather := model.Weather{}
-	answer := make([]string, 1)
-	var counter int
-	rowcity := dao.GetUserCity(chatid)
-	defer rowcity.Close()
-	city := GetNameCity(rowcity)
-	rows := dao.WeatherByInterval(firstdate, lastdate, city)
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.Scan(&weather.Id, &weather.Day, &weather.TimesOfDay, &weather.Temp, &weather.Weather,
-			&weather.Pressure, &weather.Humidity, &weather.Windspeed, &weather.Felt, &weather.City); err != nil {
-			log.Println(err)
-		}
-		daystr := weather.Day.Format("2006-01-02")
-		weather.TimesOfDay = strings.ToUpper(weather.TimesOfDay)
-		if counter%4 == 0 {
-			answer = append(answer, daystr+"\n"+weather.TimesOfDay+"\n"+weather.Temp+" "+weather.Weather+" Ощущается как "+
-				weather.Felt+"\n"+"Давление = "+weather.Pressure+" мм рт.ст., Влажность = "+weather.Humidity+", Ветер = "+weather.Windspeed+"м/с\n\n")
-		} else {
-			answer = append(answer, weather.TimesOfDay+"\n"+weather.Temp+" "+weather.Weather+" Ощущается как "+
-				weather.Felt+"\n"+"Давление = "+weather.Pressure+" мм рт.ст., Влажность = "+weather.Humidity+", Ветер = "+weather.Windspeed+"м/с\n\n")
-		}
-		counter++
-	}
-	return answer
 }
 
 func GetWeatherByNDays(limit string, chatid int64) []string {
@@ -110,6 +61,20 @@ func GetWeatherByNDays(limit string, chatid int64) []string {
 				weather.Felt+"\n"+"Давление = "+weather.Pressure+" мм рт.ст., Влажность = "+weather.Humidity+", Ветер = "+weather.Windspeed+"м/с\n\n")
 		}
 		counter++
+	}
+	return answer
+}
+
+func GetUserData(chatId int64) string {
+	user := model.User{}
+	rowData := dao.GetUserData(chatId)
+	var answer string
+	for rowData.Next() {
+		if err := rowData.Scan(&user.ChatId, &user.UserName, &user.City, &user.FirstName, &user.LastName); err != nil {
+			log.Println(err)
+		}
+		answer = "Ваши данные:\n" + "ChatId: " + strconv.Itoa(user.ChatId) + "\nUser Name: " + user.UserName + "\nИмя: " + user.FirstName + "\nФамилия: " + user.LastName +
+			"\nГород: " + strings.Title(user.City)
 	}
 	return answer
 }

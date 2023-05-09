@@ -21,7 +21,7 @@ func City() map[string]string {
 	Citylink["екатеренбург"] = Ekb
 	Citylink["казань"] = Kazan
 	Citylink["самара"] = Samara
-	Citylink["нижний Новгород"] = NizhnyNovgorod
+	Citylink["нижний новгород"] = NizhnyNovgorod
 	Citylink["ростов"] = Rostov
 	Citylink["уфа"] = Ufa
 	Citylink["железногорск"] = Zheleznogorsk

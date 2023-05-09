@@ -4,8 +4,8 @@ import (
 	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
-	"telegram_bot/internal/model"
-	"telegram_bot/resources"
+	"vkcontest/internal/model"
+	"vkcontest/resources"
 )
 
 type Source interface {
@@ -161,6 +161,21 @@ func createInlineKeyboardInfo() tgbotapi.InlineKeyboardMarkup {
 	return keyboard
 }
 
+func createInlineKeyboardData() *tgbotapi.InlineKeyboardMarkup {
+	var keyboardButtons []tgbotapi.InlineKeyboardButton
+
+	button1 := tgbotapi.NewInlineKeyboardButtonData("Показать мои данные", "Показать мои данные")
+	keyboardButtons = append(keyboardButtons, button1)
+	button2 := tgbotapi.NewInlineKeyboardButtonData("Изменить город", "Изменить город")
+	keyboardButtons = append(keyboardButtons, button2)
+
+	row1 := tgbotapi.NewInlineKeyboardRow(keyboardButtons...)
+
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(row1)
+
+	return &keyboard
+}
+
 func createInlineKeyboardCity() *tgbotapi.InlineKeyboardMarkup {
 	var keyboardButtons []tgbotapi.InlineKeyboardButton
 
@@ -191,27 +206,12 @@ func createInlineKeyboardCity() *tgbotapi.InlineKeyboardMarkup {
 
 	row3 := tgbotapi.NewInlineKeyboardRow(keyboardButtons[6:9]...)
 
-	button10 := tgbotapi.NewInlineKeyboardButtonData("Железногорск", "city железногорск")
+	button10 := tgbotapi.NewInlineKeyboardButtonData("Железногорск(Курская обл.)", "city железногорск")
 	keyboardButtons = append(keyboardButtons, button10)
 
 	row4 := tgbotapi.NewInlineKeyboardRow(keyboardButtons[9:]...)
 
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(row1, row2, row3, row4)
-
-	return &keyboard
-}
-
-func createInlineKeyboardData() *tgbotapi.InlineKeyboardMarkup {
-	var keyboardButtons []tgbotapi.InlineKeyboardButton
-
-	button1 := tgbotapi.NewInlineKeyboardButtonData("Показать мои данные", "Показать мои данные")
-	keyboardButtons = append(keyboardButtons, button1)
-	button2 := tgbotapi.NewInlineKeyboardButtonData("Изменить город", "Изменить город")
-	keyboardButtons = append(keyboardButtons, button2)
-
-	row1 := tgbotapi.NewInlineKeyboardRow(keyboardButtons...)
-
-	keyboard := tgbotapi.NewInlineKeyboardMarkup(row1)
 
 	return &keyboard
 }
@@ -263,7 +263,7 @@ func createInlineKeyboardCalculator() *tgbotapi.InlineKeyboardMarkup {
 func createInlineKeyboardOpenAPI() *tgbotapi.InlineKeyboardMarkup {
 	var keyboardButtons []tgbotapi.InlineKeyboardButton
 
-	button1 := tgbotapi.NewInlineKeyboardButtonData("Узнать свой IP", "Узнать свой IP")
+	button1 := tgbotapi.NewInlineKeyboardButtonData("Узнать курс BTC/USD", "BTC/USD")
 	keyboardButtons = append(keyboardButtons, button1)
 	button2 := tgbotapi.NewInlineKeyboardButtonData("Калорийность фруктов", "Калорийность фруктов")
 	keyboardButtons = append(keyboardButtons, button2)

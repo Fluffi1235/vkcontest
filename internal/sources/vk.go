@@ -7,7 +7,7 @@ import (
 	"github.com/SevereCloud/vksdk/v2/events"
 	"github.com/SevereCloud/vksdk/v2/longpoll-bot"
 	"log"
-	"telegram_bot/internal/model"
+	"vkcontest/internal/model"
 )
 
 type VK struct {

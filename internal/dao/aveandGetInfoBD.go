@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	_ "github.com/lib/pq"
 	"log"
-	"telegram_bot/internal/model"
-	"telegram_bot/resources"
 	"time"
+	"vkcontest/internal/model"
+	"vkcontest/resources"
 )
 
 func SaveInBd(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string) {
@@ -43,7 +43,7 @@ func RegistrUser(messageinfo *model.Message) {
 	}
 }
 
-func SaveCity(city string, chatid int64) {
+func CityChange(city string, chatid int64) {
 	db, err := sql.Open("postgres", resources.DbConnect)
 	if err != nil {
 		log.Println("Error connecting to dao")
@@ -52,7 +52,7 @@ func SaveCity(city string, chatid int64) {
 	defer db.Close()
 	_, err = db.Exec("UPDATE users set city = $1 where chatid = $2", city, chatid)
 	if err != nil {
-		log.Println("Error inserting into dao SaveCity")
+		log.Println("Error inserting into dao CityChange")
 		return
 	}
 }
