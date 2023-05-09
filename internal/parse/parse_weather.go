@@ -1,31 +1,41 @@
 package parse
 
 import (
+	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
 	"strings"
-	"telegram_bot/internal/model"
-	"telegram_bot/internal/service"
 	"time"
 )
 
-func ParsWeather() {
+type Parser struct {
+	repo repository.UniversalRepo
+}
+
+func New(repo repository.UniversalRepo) *Parser {
+	return &Parser{
+		repo: repo,
+	}
+}
+
+func (p *Parser) ParsWeather() {
 	for {
-		service.ClearDb()
+		p.repo.ClearDb()
 		citilink := model.City()
 		for key, value := range citilink {
 			res, err := http.Get(value)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 			defer res.Body.Close()
 			if res.StatusCode != 200 {
-				log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+				log.Println("status code error: %d %s", res.StatusCode, res.Status)
 			}
 			doc, err := goquery.NewDocumentFromReader(res.Body)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 			date := time.Now()
 			var k int
@@ -40,7 +50,7 @@ func ParsWeather() {
 				timesOfDay := strings.Split(temp, ",")[0]
 				temp = strings.Split(temp, ",")[1]
 				counter++
-				service.SaveInBd(date.AddDate(0, 0, k), timesOfDay, temp, weather, pressure, humidity, windspeed, felt, key)
+				p.repo.SaveInBd(date.AddDate(0, 0, k), timesOfDay, temp, weather, pressure, humidity, windspeed, felt, key)
 				if counter == 4 {
 					k++
 					counter = 0

@@ -1,25 +1,39 @@
 package bot
 
 import (
-	"errors"
+	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/internal/parse"
+	"github.com/Fluffi1235/vkcontest/internal/service"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
-	"telegram_bot/internal/model"
-	"telegram_bot/internal/service"
 )
 
-func CheckCity(msg string, chatid int64) (bool, string) {
+func DataUser(msg string, chatId int64, servise *service.Repository) (bool, string) {
+	var answer string
+	checkprefdata, _ := regexp.MatchString("Показать мои данные", msg)
+	if checkprefdata {
+		answer = servise.GetUserCity(chatId)
+		return true, answer
+	}
+	return false, answer
+}
+
+func CheckCity(msg string, chatId int64, servise *service.Repository) (bool, string) {
 	citys := model.City()
-	city := ""
-	answer := ""
+	var city string
+	var answer string
 	for k, _ := range citys {
-		checkprefday, _ := regexp.MatchString("city .+", msg)
+		checkprefday, err := regexp.MatchString("city .+", msg)
+		if err != nil {
+			log.Println(err)
+		}
 		if checkprefday {
-			city = strings.Split(msg, " ")[1]
+			city = strings.Split(msg, "city ")[1]
 			if city == k {
-				answer = service.AnswerForCheakprefCity(city)
-				service.SaveCity(k, chatid)
+				answer = servise.AnswerForCityChange(city)
+				servise.SaveCity(k, chatId)
 				return true, answer
 			} else {
 				answer = "Информации о погоде об этом городе нет"
@@ -29,62 +43,45 @@ func CheckCity(msg string, chatid int64) (bool, string) {
 	return false, answer
 }
 
-func Checkday(msg string, chatid int64) string {
-	answer := ""
-	checkprefday, _ := regexp.MatchString("погода на \\d{4}-\\d{2}-\\d{2}", msg)
-	if checkprefday {
-		msgsplit := strings.Split(msg, " ")
-		answer = service.GetWeatherByDate(msgsplit[2], chatid)
-		if answer == "" {
-			answer = "Невалидная дата"
-		}
-	}
-	return answer
-}
-
-func CheckInterval(msg string, chatid int64) ([]string, error) {
+func CheckNdays(msg string, chatId int64, servise *service.Repository) (bool, []string) {
 	answermas := make([]string, 0)
-	checkprefinterval, _ := regexp.MatchString("погода с \\d{4}-\\d{2}-\\d{2} по \\d{4}-\\d{2}-\\d{2}", msg)
+	checkprefinterval, err := regexp.MatchString("Погода \\d{1,10}", msg)
+	if err != nil {
+		log.Println(err)
+	}
 	if checkprefinterval {
 		msgsplit := strings.Split(msg, " ")
-		answermas = service.GetWeatherByInterval(msgsplit[2], msgsplit[4], chatid)
-	}
-	if len(answermas) == 1 {
-		return answermas, errors.New("Таких дат нет")
-	}
-	return answermas, nil
-}
-
-func CheckNdays(msg string, chatid int64) (bool, []string) {
-	answermas := make([]string, 0)
-	checkprefinterval, _ := regexp.MatchString("Погода \\d{1,10}", msg)
-	if checkprefinterval {
-		msgsplit := strings.Split(msg, " ")
-		answermas = service.GetWeatherByNDays(msgsplit[1], chatid)
+		answermas = servise.GetWeatherByNDays(msgsplit[1], chatId)
 		return true, answermas
 	}
 	return false, answermas
 }
 
-func Calculator(msg string, chatid int64, person map[int64]rune) bool {
-	checkprefinterval, _ := regexp.MatchString("calc [-+*/]", msg)
+func Calculator(msg string, chatId int64, person map[int64]rune) bool {
+	checkprefinterval, err := regexp.MatchString("calc [-+*/]", msg)
+	if err != nil {
+		log.Println(err)
+	}
 	if checkprefinterval {
 		symbol := msg[len(msg)-1]
-		person[chatid] = rune(symbol)
+		person[chatId] = rune(symbol)
 		return true
 	}
 	return false
 }
 
-func isTwoNumbers(msg string, chatid int64, person map[int64]rune) string {
+func isTwoNumbers(msg string, chatId int64, person map[int64]rune) string {
 	var rez float64
 	var answer string
-	checkprefinterval, _ := regexp.MatchString("\\d+ \\d+", msg)
+	checkprefinterval, err := regexp.MatchString("[-]?\\d+ [-]?\\d+", msg)
+	if err != nil {
+		log.Println(err)
+	}
 	if checkprefinterval {
 		msgsplit := strings.Split(msg, " ")
 		num1, _ := strconv.Atoi(msgsplit[0])
 		num2, _ := strconv.Atoi(msgsplit[1])
-		switch person[chatid] {
+		switch person[chatId] {
 		case '+':
 			rez = float64(num1) + float64(num2)
 		case '-':
@@ -92,13 +89,50 @@ func isTwoNumbers(msg string, chatid int64, person map[int64]rune) string {
 		case '*':
 			rez = float64(num1) * float64(num2)
 		case '/':
+			if num2 == 0 {
+				return "На 0 делить нельзя"
+			}
 			rez = float64(num1) / float64(num2)
 		default:
 			return "Не выбрали операцию в калькуляторе"
 		}
-		delete(person, chatid)
-		answer = strconv.FormatFloat(rez, 'f', -1, 64)
+		delete(person, chatId)
+		answer = strconv.FormatFloat(rez, 'f', 1, 64)
 		return answer
 	}
-	return ""
+	return answer
+}
+
+func CalFruit(msg string) (bool, string) {
+	var answer string
+	checkprefdata, err := regexp.MatchString("apiFruit .+", msg)
+	if err != nil {
+		log.Println(err)
+	}
+	if checkprefdata {
+		msgsplit := strings.Split(msg, " ")
+		fruitinfo := parse.ParseFruit(msgsplit[1])
+		answer = "Энергетическая ценность " + msgsplit[2] + " на 100г: " +
+			"\nКалорийность: " + strconv.FormatFloat(fruitinfo.Calories, 'f', 1, 64) + "кк" +
+			"\nПищевая ценность " + msgsplit[2] + " на 100г:" +
+			"\nЖиры: " + strconv.FormatFloat(fruitinfo.Fats, 'f', 1, 64) + "г" +
+			"\nСахар: " + strconv.FormatFloat(fruitinfo.Sugar, 'f', 1, 64) + "г" +
+			"\nУглеводы: " + strconv.FormatFloat(fruitinfo.Carbohyddrates, 'f', 1, 64) + "г" +
+			"\nБелки: " + strconv.FormatFloat(fruitinfo.Protein, 'f', 1, 64) + "г"
+		return true, answer
+	}
+	return false, answer
+}
+
+func Btc(msg string) (bool, string) {
+	var answer string
+	checkprefBtc, err := regexp.MatchString("BTC/USD", msg)
+	if err != nil {
+		log.Println(err)
+	}
+	if checkprefBtc {
+		answer = parse.ParseBtc()
+		return true, answer
+	}
+	return false, answer
 }

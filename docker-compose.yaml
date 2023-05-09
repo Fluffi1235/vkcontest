@@ -1,0 +1,30 @@
+version: '2'
+
+networks:
+  vkcontest:
+    driver: bridge
+
+services:
+  postgresql:
+    image: 'bitnami/postgresql:latest'
+    environment:
+      - POSTGRESQL_PASSWORD=
+      - POSTGRESQL_USERNAME=
+      - POSTGRESQL_DATABASE=
+    ports:
+      - 5432:5432
+    networks:
+      -   vkcontest
+    volumes:
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+  vkcontest-bot:
+    image: vkcontest
+    build:
+      dockerfile: ./Dockerfile
+    networks:
+      - vkcontest
+    restart: always
+    links:
+      - postgresql
