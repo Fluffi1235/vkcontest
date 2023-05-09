@@ -278,29 +278,29 @@ func createInlineKeyboardOpenAPI() *tgbotapi.InlineKeyboardMarkup {
 func createInlineKeyboardFruits() *tgbotapi.InlineKeyboardMarkup {
 	var keyboardButtons []tgbotapi.InlineKeyboardButton
 
-	button1 := tgbotapi.NewInlineKeyboardButtonData("Яблоко", "apiFruit apple")
+	button1 := tgbotapi.NewInlineKeyboardButtonData("Яблоко", "apiFruit apple яблок")
 	keyboardButtons = append(keyboardButtons, button1)
-	button2 := tgbotapi.NewInlineKeyboardButtonData("Банан", "apiFruit Banana")
+	button2 := tgbotapi.NewInlineKeyboardButtonData("Банан", "apiFruit Banana бананов")
 	keyboardButtons = append(keyboardButtons, button2)
-	button3 := tgbotapi.NewInlineKeyboardButtonData("Апельсин", "apiFruit Orange")
+	button3 := tgbotapi.NewInlineKeyboardButtonData("Апельсин", "apiFruit Orange апельсинов")
 	keyboardButtons = append(keyboardButtons, button3)
 
 	row1 := tgbotapi.NewInlineKeyboardRow(keyboardButtons...)
 
-	button4 := tgbotapi.NewInlineKeyboardButtonData("Дыня", "apiFruit Melon")
+	button4 := tgbotapi.NewInlineKeyboardButtonData("Дыня", "apiFruit Melon дыни")
 	keyboardButtons = append(keyboardButtons, button4)
-	button5 := tgbotapi.NewInlineKeyboardButtonData("Лимон", "apiFruit Lemon")
+	button5 := tgbotapi.NewInlineKeyboardButtonData("Лимон", "apiFruit Lemon лимона")
 	keyboardButtons = append(keyboardButtons, button5)
-	button6 := tgbotapi.NewInlineKeyboardButtonData("Лайм", "apiFruit Lime")
+	button6 := tgbotapi.NewInlineKeyboardButtonData("Лайм", "apiFruit Lime лайма")
 	keyboardButtons = append(keyboardButtons, button6)
 
 	row2 := tgbotapi.NewInlineKeyboardRow(keyboardButtons[3:6]...)
 
-	button7 := tgbotapi.NewInlineKeyboardButtonData("Гранат", "apiFruit Pomegranate")
+	button7 := tgbotapi.NewInlineKeyboardButtonData("Гранат", "apiFruit Pomegranate граната")
 	keyboardButtons = append(keyboardButtons, button7)
-	button8 := tgbotapi.NewInlineKeyboardButtonData("Виноград", "apiFruit Grape")
+	button8 := tgbotapi.NewInlineKeyboardButtonData("Виноград", "apiFruit Grape винограда")
 	keyboardButtons = append(keyboardButtons, button8)
-	button9 := tgbotapi.NewInlineKeyboardButtonData("Авокадо", "apiFruit Avocado")
+	button9 := tgbotapi.NewInlineKeyboardButtonData("Авокадо", "apiFruit Avocado авокадо")
 	keyboardButtons = append(keyboardButtons, button9)
 
 	row3 := tgbotapi.NewInlineKeyboardRow(keyboardButtons[6:]...)

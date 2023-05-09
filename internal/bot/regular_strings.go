@@ -76,6 +76,9 @@ func isTwoNumbers(msg string, chatId int64, person map[int64]rune) string {
 		case '*':
 			rez = float64(num1) * float64(num2)
 		case '/':
+			if num2 == 0 {
+				return "На 0 делить нельзя"
+			}
 			rez = float64(num1) / float64(num2)
 		default:
 			return "Не выбрали операцию в калькуляторе"
@@ -93,11 +96,13 @@ func CalFruit(msg string) (bool, string) {
 	if checkprefdata {
 		msgsplit := strings.Split(msg, " ")
 		fruitinfo := parse.ParseFruit(msgsplit[1])
-		answer = "Каллорийность: " + strconv.FormatFloat(fruitinfo.Calories, 'f', 1, 64) +
-			"\nЖиры: " + strconv.FormatFloat(fruitinfo.Fats, 'f', 1, 64) +
-			"\nСахар: " + strconv.FormatFloat(fruitinfo.Sugar, 'f', 1, 64) +
-			"\nУглеводы: " + strconv.FormatFloat(fruitinfo.Carbohyddrates, 'f', 1, 64) +
-			"\nБелок: " + strconv.FormatFloat(fruitinfo.Protein, 'f', 1, 64)
+		answer = "Энергетическая ценность " + msgsplit[2] + " на 100г: " +
+			"\nКалорийность: " + strconv.FormatFloat(fruitinfo.Calories, 'f', 1, 64) + "кк" +
+			"\nПищевая ценность " + msgsplit[2] + " на 100г:" +
+			"\nЖиры: " + strconv.FormatFloat(fruitinfo.Fats, 'f', 1, 64) + "г" +
+			"\nСахар: " + strconv.FormatFloat(fruitinfo.Sugar, 'f', 1, 64) + "г" +
+			"\nУглеводы: " + strconv.FormatFloat(fruitinfo.Carbohyddrates, 'f', 1, 64) + "г" +
+			"\nБелки: " + strconv.FormatFloat(fruitinfo.Protein, 'f', 1, 64) + "г"
 		return true, answer
 	}
 	return false, answer
