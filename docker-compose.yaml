@@ -26,3 +26,5 @@ services:
     networks:
       - vkcontest
     restart: always
+    links:
+      - postgresql
