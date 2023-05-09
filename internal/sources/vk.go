@@ -2,12 +2,12 @@ package sources
 
 import (
 	"context"
+	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/SevereCloud/vksdk/v2/api"
 	"github.com/SevereCloud/vksdk/v2/api/params"
 	"github.com/SevereCloud/vksdk/v2/events"
 	"github.com/SevereCloud/vksdk/v2/longpoll-bot"
 	"log"
-	"vkcontest/internal/model"
 )
 
 type VK struct {

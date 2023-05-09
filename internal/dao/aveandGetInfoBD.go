@@ -2,11 +2,11 @@ package dao
 
 import (
 	"database/sql"
+	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/resources"
 	_ "github.com/lib/pq"
 	"log"
 	"time"
-	"vkcontest/internal/model"
-	"vkcontest/resources"
 )
 
 func SaveInBd(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string) {

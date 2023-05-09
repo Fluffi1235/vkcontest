@@ -2,10 +2,10 @@ package sources
 
 import (
 	"context"
+	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/resources"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
-	"vkcontest/internal/model"
-	"vkcontest/resources"
 )
 
 type Source interface {

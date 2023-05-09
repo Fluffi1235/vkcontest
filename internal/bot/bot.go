@@ -2,12 +2,12 @@ package bot
 
 import (
 	"context"
+	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/internal/service"
+	"github.com/Fluffi1235/vkcontest/internal/sources"
 	"log"
 	"strings"
 	"sync"
-	"vkcontest/internal/model"
-	"vkcontest/internal/service"
-	"vkcontest/internal/sources"
 )
 
 type Bot struct {

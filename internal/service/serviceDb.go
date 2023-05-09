@@ -2,12 +2,12 @@ package service
 
 import (
 	"database/sql"
+	"github.com/Fluffi1235/vkcontest/internal/dao"
+	"github.com/Fluffi1235/vkcontest/internal/model"
 	"log"
 	"strconv"
 	"strings"
 	"time"
-	"vkcontest/internal/dao"
-	"vkcontest/internal/model"
 )
 
 func SaveInBd(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string) {

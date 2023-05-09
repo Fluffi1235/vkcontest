@@ -1,13 +1,13 @@
 package parse
 
 import (
+	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/internal/service"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
 	"strings"
 	"time"
-	"vkcontest/internal/model"
-	"vkcontest/internal/service"
 )
 
 func ParsWeather() {

@@ -1,4 +1,4 @@
-module vkcontest
+module github.com/Fluffi1235/vkcontest
 
 go 1.17
 

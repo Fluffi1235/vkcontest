@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"github.com/Fluffi1235/vkcontest/internal/bot"
+	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/internal/parse"
+	"github.com/Fluffi1235/vkcontest/internal/sources"
 	"sync"
-	"vkcontest/internal/bot"
-	"vkcontest/internal/model"
-	"vkcontest/internal/parse"
-	"vkcontest/internal/sources"
 )
 
 func main() {

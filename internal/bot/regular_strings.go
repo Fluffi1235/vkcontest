@@ -1,12 +1,12 @@
 package bot
 
 import (
+	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/internal/parse"
+	"github.com/Fluffi1235/vkcontest/internal/service"
 	"regexp"
 	"strconv"
 	"strings"
-	"vkcontest/internal/model"
-	"vkcontest/internal/parse"
-	"vkcontest/internal/service"
 )
 
 func DataUser(msg string, chatId int64) (bool, string) {

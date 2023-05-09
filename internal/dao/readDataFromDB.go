@@ -2,8 +2,8 @@ package dao
 
 import (
 	"database/sql"
+	"github.com/Fluffi1235/vkcontest/resources"
 	"log"
-	"vkcontest/resources"
 )
 
 func GetUserData(chatId int64) *sql.Rows {
