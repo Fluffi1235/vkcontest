@@ -39,16 +39,22 @@ func (r *Repository) AnswerForCityChange(city string) string {
 	return answer
 }
 
-func (r *Repository) GetUserCity(chatId int64) string {
+func (r *Repository) GetUserCity(chatId int64, platform string) string {
 	user := model.User{}
-	rowData := r.repo.GetUserData(chatId)
+	rowData := r.repo.GetUserData(chatId, platform)
 	var answer string
 	for rowData.Next() {
-		if err := rowData.Scan(&user.ChatId, &user.UserName, &user.City, &user.FirstName, &user.LastName); err != nil {
+		if err := rowData.Scan(&user.ChatId, &user.UserName, &user.City, &user.FirstName, &user.LastName, &user.Platform); err != nil {
 			log.Println(err)
 		}
-		answer = "Ваши данные:\n" + "ChatId: " + strconv.Itoa(user.ChatId) + "\nUser Name: " + user.UserName + "\nИмя: " + user.FirstName + "\nФамилия: " + user.LastName +
-			"\nГород: " + strings.Title(user.City)
+		if user.Platform == "tg" {
+			answer = "Ваши данные:\n" + "ChatId: " + strconv.Itoa(user.ChatId) + "\nUser Name: @" + user.UserName + "\nИмя: " + user.FirstName + "\nФамилия: " + user.LastName +
+				"\nГород: " + strings.Title(user.City)
+		}
+		if user.Platform == "vk" {
+			answer = "Ваши данные:\n" + "ChatId: " + strconv.Itoa(user.ChatId) + "\nUser Name: @" + user.UserName + "\nИмя: " + user.FirstName + "\nФамилия: " + user.LastName +
+				"\nГород: " + strings.Title(user.City)
+		}
 	}
 	return answer
 }

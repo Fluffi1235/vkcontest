@@ -18,6 +18,7 @@ import (
 type Config struct {
 	ConnectDb string `yaml:"connectdb"`
 	TgToken   string `yaml:"tgtoken"`
+	VkToken   string `yaml:"vktoken"`
 }
 
 func LoadConfigFromYaml() (*Config, error) {
@@ -50,7 +51,7 @@ func main() {
 	var (
 		mybot = bot.NewBot(map[model.SourceType]sources.Source{
 			model.Telegram: sources.NewTG(config.TgToken),
-			model.Vk:       sources.NewVK(),
+			model.Vk:       sources.NewVK(config.VkToken),
 		})
 	)
 	wg := &sync.WaitGroup{}

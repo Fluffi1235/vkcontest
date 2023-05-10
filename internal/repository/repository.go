@@ -31,8 +31,8 @@ func (r Repository) RegistrUser(messageinfo *model.Message) {
 	if rows.Next() {
 		return
 	}
-	_, err = r.db.Exec("INSERT INTO Users(chatid, username, city, first_name, last_name) VALUES($1, $2, $3, $4, $5)",
-		messageinfo.ChatID, messageinfo.Username, "москва", messageinfo.FirstName, messageinfo.LastName)
+	_, err = r.db.Exec("INSERT INTO Users(chatid, username, city, first_name, last_name, platform) VALUES($1, $2, $3, $4, $5, $6)",
+		messageinfo.ChatID, messageinfo.Username, "москва", messageinfo.FirstName, messageinfo.LastName, messageinfo.Platform)
 	if err != nil {
 		log.Println("Error inserting into dao RegistrUser")
 		return
@@ -54,8 +54,8 @@ func (r Repository) ClearDb() {
 	}
 }
 
-func (r Repository) GetUserData(chatId int64) *sql.Rows {
-	row, err := r.db.Query("SELECT * FROM users where chatid = $1", chatId)
+func (r Repository) GetUserData(chatId int64, platform string) *sql.Rows {
+	row, err := r.db.Query("SELECT * FROM users where chatid = $1 and platform = $2", chatId, platform)
 	if err != nil {
 		log.Println(err)
 	}

@@ -16,5 +16,6 @@ create table Users (
     username   varchar(50),
     city       varchar(50),
     first_name varchar(50),
-    last_name  varchar(50)
+    last_name  varchar(50),
+    platform   varchar(50),
 )

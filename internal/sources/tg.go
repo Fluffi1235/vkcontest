@@ -17,15 +17,14 @@ type Source interface {
 }
 
 type TG struct {
-	Chan   tgbotapi.UpdatesChannel
-	bot    *tgbotapi.BotAPI
-	CharID int64
+	Chan tgbotapi.UpdatesChannel
+	bot  *tgbotapi.BotAPI
 }
 
 func NewTG(token string) Source {
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
-		log.Panic(err)
+		log.Fatalln(err)
 	}
 
 	bot.Debug = false
@@ -62,6 +61,7 @@ func (tg *TG) Read(ctx context.Context, msgChan chan<- *model.Message) {
 			msg := &model.Message{
 				Source:    tg.GetSource(),
 				Text:      update.Message.Text,
+				Platform:  "tg",
 				ChatID:    update.Message.Chat.ID,
 				Username:  update.Message.Chat.UserName,
 				FirstName: update.Message.Chat.FirstName,
@@ -73,9 +73,11 @@ func (tg *TG) Read(ctx context.Context, msgChan chan<- *model.Message) {
 		}
 		if update.CallbackQuery != nil {
 			msg := &model.Message{
-				Source: tg.GetSource(),
-				ChatID: int64(update.CallbackQuery.From.ID),
-				Button: update.CallbackQuery,
+				Source:          tg.GetSource(),
+				Platform:        "tg",
+				ChatID:          int64(update.CallbackQuery.From.ID),
+				ButtonDate:      update.CallbackQuery.Data,
+				ButtonMessageID: update.CallbackQuery.Message.MessageID,
 			}
 			_ = msg
 

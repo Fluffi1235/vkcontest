@@ -10,11 +10,12 @@ import (
 	"strings"
 )
 
-func DataUser(msg string, chatId int64, servise *service.Repository) (bool, string) {
+func DataUser(msg string, chatId int64, servise *service.Repository, platform string) (bool, string) {
 	var answer string
+
 	checkprefdata, _ := regexp.MatchString("Показать мои данные", msg)
 	if checkprefdata {
-		answer = servise.GetUserCity(chatId)
+		answer = servise.GetUserCity(chatId, platform)
 		return true, answer
 	}
 	return false, answer
@@ -73,26 +74,26 @@ func Calculator(msg string, chatId int64, person map[int64]rune) bool {
 func isTwoNumbers(msg string, chatId int64, person map[int64]rune) string {
 	var rez float64
 	var answer string
-	checkprefinterval, err := regexp.MatchString("[-]?\\d+ [-]?\\d+", msg)
+	checkprefinterval, err := regexp.MatchString("[-]?\\d+\\.?\\d+ [-]?\\d+\\.?\\d+", msg)
 	if err != nil {
 		log.Println(err)
 	}
 	if checkprefinterval {
 		msgsplit := strings.Split(msg, " ")
-		num1, _ := strconv.Atoi(msgsplit[0])
-		num2, _ := strconv.Atoi(msgsplit[1])
+		num1, _ := strconv.ParseFloat(msgsplit[0], 64)
+		num2, _ := strconv.ParseFloat(msgsplit[1], 64)
 		switch person[chatId] {
 		case '+':
-			rez = float64(num1) + float64(num2)
+			rez = num1 + num2
 		case '-':
-			rez = float64(num1) - float64(num2)
+			rez = num1 - num2
 		case '*':
-			rez = float64(num1) * float64(num2)
+			rez = num1 * num2
 		case '/':
 			if num2 == 0 {
 				return "На 0 делить нельзя"
 			}
-			rez = float64(num1) / float64(num2)
+			rez = num1 / num2
 		default:
 			return "Не выбрали операцию в калькуляторе"
 		}

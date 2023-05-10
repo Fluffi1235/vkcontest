@@ -39,22 +39,22 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message, repo repository.Uni
 	mpperson := make(map[int64]rune, 0)
 	var answer string
 	for msg := range msgChan {
-		if msg.Button != nil {
-			log.Printf("Нажата кнопка с данными: %s\n", msg.Button.Data)
+		if msg.ButtonDate != "" && msg.ButtonMessageID != 0 {
+			log.Printf("Нажата кнопка с данными: %s\n", msg.ButtonDate)
 
-			if funcResponse, answerdata := DataUser(msg.Button.Data, msg.ChatID, service); funcResponse {
-				b.Sources[msg.Source].EditMessage(answerdata, msg.ChatID, msg.Button.Message.MessageID)
+			if funcResponse, answerdata := DataUser(msg.ButtonDate, msg.ChatID, service, msg.Platform); funcResponse {
+				b.Sources[msg.Source].EditMessage(answerdata, msg.ChatID, msg.ButtonMessageID)
 			}
 
-			if funcResponse, answercity := CheckCity(msg.Button.Data, msg.ChatID, service); funcResponse {
-				b.Sources[msg.Source].EditMessage(answercity, msg.ChatID, msg.Button.Message.MessageID)
+			if funcResponse, answercity := CheckCity(msg.ButtonDate, msg.ChatID, service); funcResponse {
+				b.Sources[msg.Source].EditMessage(answercity, msg.ChatID, msg.ButtonMessageID)
 			}
 
-			if funcResponse, answermasNday := CheckNdays(msg.Button.Data, msg.ChatID, service); funcResponse {
+			if funcResponse, answermasNday := CheckNdays(msg.ButtonDate, msg.ChatID, service); funcResponse {
 				for i := 1; i < len(answermasNday); i++ {
 					answer = answer + answermasNday[i]
 					if i%4 == 0 && i < 5 {
-						b.Sources[msg.Source].EditMessage(answer, msg.ChatID, msg.Button.Message.MessageID)
+						b.Sources[msg.Source].EditMessage(answer, msg.ChatID, msg.ButtonMessageID)
 						answer = ""
 					}
 					if i%4 == 0 && i >= 5 {
@@ -64,31 +64,32 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message, repo repository.Uni
 				}
 			}
 
-			if Calculator(msg.Button.Data, msg.ChatID, mpperson) {
-				b.Sources[msg.Source].EditMessage("Введите 2 числа через пробел", msg.ChatID, msg.Button.Message.MessageID)
+			if Calculator(msg.ButtonDate, msg.ChatID, mpperson) {
+				b.Sources[msg.Source].EditMessage("Введите 2 числа через пробел", msg.ChatID, msg.ButtonMessageID)
 			}
 
-			if funcResponse, answerCalFruit := CalFruit(msg.Button.Data); funcResponse {
-				b.Sources[msg.Source].EditMessage(answerCalFruit, msg.ChatID, msg.Button.Message.MessageID)
+			if funcResponse, answerCalFruit := CalFruit(msg.ButtonDate); funcResponse {
+				b.Sources[msg.Source].EditMessage(answerCalFruit, msg.ChatID, msg.ButtonMessageID)
 			}
 
-			if funcResponse, answerBTC := Btc(msg.Button.Data); funcResponse {
-				b.Sources[msg.Source].EditMessage("Текущий курс BTC/USD: "+answerBTC+"\nДанные были взяты с сайта https://www.coindesk.com/search?s=bitcoin", msg.ChatID, msg.Button.Message.MessageID)
+			if funcResponse, answerBTC := Btc(msg.ButtonDate); funcResponse {
+				b.Sources[msg.Source].EditMessage("Текущий курс BTC/USD: "+answerBTC+
+					"\nДанные были взяты с сайта https://www.coindesk.com/search?s=bitcoin", msg.ChatID, msg.ButtonMessageID)
 			}
 
-			switch msg.Button.Data {
+			switch msg.ButtonDate {
 			case "Мои данные":
-				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
+				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
 			case "Изменить город":
-				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
+				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
 			case "Прогноз погоды":
-				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
+				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
 			case "Калькулятор":
-				b.Sources[msg.Source].EditMessageWithButtons("Мои функции выберите одну из них", msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
+				b.Sources[msg.Source].EditMessageWithButtons("Мои функции выберите одну из них", msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
 			case "OPEN API":
-				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
+				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
 			case "Калорийность фруктов":
-				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.Button.Data, msg.ChatID, msg.Button.Data, msg.Button.Message.MessageID)
+				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
 			}
 		}
 		if msg.Text != "" {

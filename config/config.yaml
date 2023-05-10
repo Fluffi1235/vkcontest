@@ -1,2 +1,3 @@
-connectdb: "host=localhost port= user= password= dbname= sslmode=disable"
+connectdb: ""
 tgtoken: ""
+vktoken: ""
