@@ -113,17 +113,17 @@ func (tg *TG) SendButton(msg string, clientID int64) {
 func (tg *TG) EditMessageWithButtons(msg string, clientID int64, button string, msgId int) {
 	editmsg := tgbotapi.NewEditMessageText(clientID, msgId, msg)
 	switch button {
-	case "Мои данные":
+	case "мои данные":
 		editmsg.ReplyMarkup = createInlineKeyboardData()
-	case "Прогноз погоды":
+	case "прогноз погоды":
 		editmsg.ReplyMarkup = createInlineKeyboardWeather()
-	case "Калькулятор":
+	case "калькулятор":
 		editmsg.ReplyMarkup = createInlineKeyboardCalculator()
-	case "OPEN API":
+	case "open api":
 		editmsg.ReplyMarkup = createInlineKeyboardOpenAPI()
-	case "Калорийность фруктов":
+	case "калорийность фруктов":
 		editmsg.ReplyMarkup = createInlineKeyboardFruits()
-	case "Изменить город":
+	case "изменить город":
 		editmsg.ReplyMarkup = createInlineKeyboardCity()
 	}
 	_, err := tg.bot.Send(editmsg)
@@ -225,14 +225,12 @@ func createInlineKeyboardWeather() *tgbotapi.InlineKeyboardMarkup {
 
 	row1 := tgbotapi.NewInlineKeyboardRow(keyboardButtons...)
 
-	button2 := tgbotapi.NewInlineKeyboardButtonData("Погода на завтра", "Погода 2")
+	button2 := tgbotapi.NewInlineKeyboardButtonData("Погода на 5 дней", "Погода 5")
 	keyboardButtons = append(keyboardButtons, button2)
-	button3 := tgbotapi.NewInlineKeyboardButtonData("Погода на 5 дней", "Погода 5")
+	button3 := tgbotapi.NewInlineKeyboardButtonData("Погода на 10 дней", "Погода 10")
 	keyboardButtons = append(keyboardButtons, button3)
-	button4 := tgbotapi.NewInlineKeyboardButtonData("Погода на 10 дней", "Погода 10")
-	keyboardButtons = append(keyboardButtons, button4)
 
-	row2 := tgbotapi.NewInlineKeyboardRow(keyboardButtons[2:]...)
+	row2 := tgbotapi.NewInlineKeyboardRow(keyboardButtons[1:]...)
 
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(row1, row2)
 

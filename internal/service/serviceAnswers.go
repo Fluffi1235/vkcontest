@@ -39,7 +39,7 @@ func (r *Repository) AnswerForCityChange(city string) string {
 	return answer
 }
 
-func (r *Repository) GetUserCity(chatId int64, platform string) string {
+func (r *Repository) GetUserData(chatId int64, platform string) string {
 	user := model.User{}
 	rowData := r.repo.GetUserData(chatId, platform)
 	var answer string
@@ -52,7 +52,7 @@ func (r *Repository) GetUserCity(chatId int64, platform string) string {
 				"\nГород: " + strings.Title(user.City)
 		}
 		if user.Platform == "vk" {
-			answer = "Ваши данные:\n" + "ChatId: " + strconv.Itoa(user.ChatId) + "\nUser Name: @" + user.UserName + "\nИмя: " + user.FirstName + "\nФамилия: " + user.LastName +
+			answer = "Ваши данные:\n" + "ChatId: " + strconv.Itoa(user.ChatId) + "\nИмя: " + user.FirstName + "\nФамилия: " + user.LastName +
 				"\nГород: " + strings.Title(user.City)
 		}
 	}

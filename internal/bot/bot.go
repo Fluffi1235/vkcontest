@@ -39,8 +39,10 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message, repo repository.Uni
 	mpperson := make(map[int64]rune, 0)
 	var answer string
 	for msg := range msgChan {
-		if msg.ButtonDate != "" && msg.ButtonMessageID != 0 {
+		answer = ""
+		if msg.ButtonDate != "" && msg.ButtonMessageID != -1 {
 			log.Printf("Нажата кнопка с данными: %s\n", msg.ButtonDate)
+			msg.ButtonDate = strings.ToLower(msg.ButtonDate)
 
 			if funcResponse, answerdata := DataUser(msg.ButtonDate, msg.ChatID, service, msg.Platform); funcResponse {
 				b.Sources[msg.Source].EditMessage(answerdata, msg.ChatID, msg.ButtonMessageID)
@@ -78,17 +80,17 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message, repo repository.Uni
 			}
 
 			switch msg.ButtonDate {
-			case "Мои данные":
+			case "мои данные":
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
-			case "Изменить город":
+			case "изменить город":
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
-			case "Прогноз погоды":
+			case "прогноз погоды":
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
-			case "Калькулятор":
+			case "калькулятор":
 				b.Sources[msg.Source].EditMessageWithButtons("Мои функции выберите одну из них", msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
-			case "OPEN API":
+			case "open api":
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
-			case "Калорийность фруктов":
+			case "калорийность фруктов":
 				b.Sources[msg.Source].EditMessageWithButtons("Вы нажали кнопку "+msg.ButtonDate, msg.ChatID, msg.ButtonDate, msg.ButtonMessageID)
 			}
 		}
@@ -102,6 +104,10 @@ func (b *Bot) HandlingMessage(msgChan <-chan *model.Message, repo repository.Uni
 
 			switch message {
 			case "/start":
+				repo.RegistrUser(msg)
+				answer = service.AnswerStart()
+				b.Sources[msg.Source].Send(answer, msg.ChatID)
+			case "начать":
 				repo.RegistrUser(msg)
 				answer = service.AnswerStart()
 				b.Sources[msg.Source].Send(answer, msg.ChatID)
