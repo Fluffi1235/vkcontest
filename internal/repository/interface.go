@@ -11,7 +11,7 @@ type UniversalRepo interface {
 	RegistrUser(messageinfo *model.Message)
 	CityChange(city string, chatid int64)
 	ClearDb()
-	GetUserData(chatId int64) *sql.Rows
+	GetUserData(chatId int64, platform string) *sql.Rows
 	GetUserCity(chatId int64) *sql.Rows
 	WeatherByNDays(limit int, city string) *sql.Rows
 	GetNameCity(rowcity *sql.Rows) string
