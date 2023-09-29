@@ -3,65 +3,42 @@ package main
 import (
 	"context"
 	"database/sql"
-	"errors"
-	"fmt"
 	"github.com/Fluffi1235/vkcontest/internal/bot"
+	"github.com/Fluffi1235/vkcontest/internal/load_configs"
 	"github.com/Fluffi1235/vkcontest/internal/model"
-	"github.com/Fluffi1235/vkcontest/internal/parse"
+	"github.com/Fluffi1235/vkcontest/internal/parsers"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/Fluffi1235/vkcontest/internal/sources"
+	"github.com/Fluffi1235/vkcontest/internal/sources/tg"
 	_ "github.com/lib/pq"
-	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"log"
 	"sync"
 )
 
-type Config struct {
-	ConnectDb string `yaml:"connectdb"`
-	TgToken   string `yaml:"tgtoken"`
-}
-
-func LoadConfigFromYaml() (*Config, error) {
-	var conf Config
-	f, err := ioutil.ReadFile("./config/config.yaml")
-	if err != nil {
-		return nil, errors.New("Can't read configs file")
-	}
-	err = yaml.Unmarshal(f, &conf)
-	if err != nil {
-		fmt.Println("Error read file")
-	}
-	return &conf, nil
-}
-
 func main() {
-	config, err := LoadConfigFromYaml()
+	config, err := load_configs.LoadConfigFromYaml()
 	if err != nil {
-		fmt.Print("Error load configs")
-	} else {
-		fmt.Println("Config read successfully")
+		log.Fatal(err)
 	}
+
 	db, err := sql.Open("postgres", config.ConnectDb)
 	if err != nil {
-		log.Fatalln("Error connecting to DB", err)
+		log.Fatal(err)
 	}
 	defer db.Close()
 
 	repo := repository.New(db)
+	go parsers.New(repo).ParsWeather()
 
 	ctx := context.Background()
-	var (
-		mybot = bot.NewBot(map[model.SourceType]sources.Source{
-			model.Telegram: sources.NewTG(config.TgToken),
-			model.Vk:       sources.NewVK(),
-		})
-	)
+
+	mybot := bot.NewBot(map[model.SourceType]sources.Source{
+		model.Telegram: tg.NewTG(config.TgToken),
+		//model.Vk:       vk.NewVK(config.VkToken),
+	})
+
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-
-	go parse.New(repo).ParsWeather()
 	go mybot.RunBot(ctx, wg, repo)
-
 	wg.Wait()
 }

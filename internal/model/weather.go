@@ -10,7 +10,7 @@ type Weather struct {
 	Weather    string
 	Pressure   string
 	Humidity   string
-	Windspeed  string
+	WindSpeed  string
 	Felt       string
 	City       string
 }

@@ -1,6 +1,7 @@
-package parse
+package parsers
 
 import (
+	"github.com/Fluffi1235/vkcontest/internal/load_configs"
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/PuerkitoBio/goquery"
@@ -11,31 +12,36 @@ import (
 )
 
 type Parser struct {
-	repo repository.UniversalRepo
+	repo repository.WheatherRepo
 }
 
-func New(repo repository.UniversalRepo) *Parser {
+func New(repo repository.WheatherRepo) *Parser {
 	return &Parser{
 		repo: repo,
 	}
 }
 
 func (p *Parser) ParsWeather() {
-	for {
+	t, err := load_configs.LoadConfigTimeDuration()
+	if err != nil {
+		log.Fatal(err)
+	}
+	citilink := model.City()
+	ticker := time.Tick(time.Duration(t.WeatherUpdateInfo) * time.Hour)
+	for range ticker {
 		p.repo.ClearDb()
-		citilink := model.City()
 		for key, value := range citilink {
 			res, err := http.Get(value)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 			defer res.Body.Close()
 			if res.StatusCode != 200 {
-				log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+				log.Printf("status code error: %d %s", res.StatusCode, res.Status)
 			}
 			doc, err := goquery.NewDocumentFromReader(res.Body)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 			date := time.Now()
 			var k int
@@ -50,13 +56,12 @@ func (p *Parser) ParsWeather() {
 				timesOfDay := strings.Split(temp, ",")[0]
 				temp = strings.Split(temp, ",")[1]
 				counter++
-				p.repo.SaveInBd(date.AddDate(0, 0, k), timesOfDay, temp, weather, pressure, humidity, windspeed, felt, key)
+				p.repo.SaveWheather(date.AddDate(0, 0, k), timesOfDay, temp, weather, pressure, humidity, windspeed, felt, key)
 				if counter == 4 {
 					k++
 					counter = 0
 				}
 			})
 		}
-		time.Sleep(1 * time.Hour)
 	}
 }

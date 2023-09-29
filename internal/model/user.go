@@ -5,5 +5,7 @@ type User struct {
 	UserName  string
 	FirstName string
 	LastName  string
+	Username  string
 	City      string
+	Platform  string
 }

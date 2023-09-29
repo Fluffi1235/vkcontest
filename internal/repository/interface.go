@@ -7,12 +7,29 @@ import (
 )
 
 type UniversalRepo interface {
-	SaveInBd(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string)
-	RegistrUser(messageinfo *model.Message)
+	UserRepo
+	WheatherRepo
+}
+
+type Repository struct {
+	db *sql.DB
+}
+
+func New(db *sql.DB) UniversalRepo {
+	return &Repository{
+		db: db,
+	}
+}
+
+type UserRepo interface {
+	RegistrUser(messageinfo *model.MessageInfoText)
 	CityChange(city string, chatid int64)
-	ClearDb()
-	GetUserData(chatId int64) *sql.Rows
-	GetUserCity(chatId int64) *sql.Rows
+	GetUserData(chatId int64, platform string) *sql.Rows
+	GetCityOfUser(chatId int64) *sql.Rows
+}
+
+type WheatherRepo interface {
+	SaveWheather(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string)
 	WeatherByNDays(limit int, city string) *sql.Rows
-	GetNameCity(rowcity *sql.Rows) string
+	ClearDb()
 }

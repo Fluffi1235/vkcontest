@@ -11,10 +11,11 @@ create table weather_forecast(
     city        varchar(50)
 );
 
-create table Users (
+create table users (
     chatId     bigint primary key,
     username   varchar(50),
     city       varchar(50),
     first_name varchar(50),
-    last_name  varchar(50)
-)
+    last_name  varchar(50),
+    platform   varchar(50)
+);
