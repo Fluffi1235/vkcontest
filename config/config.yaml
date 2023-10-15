@@ -1,3 +1,6 @@
-connectdb: "host=postgresql port=5432 user= password= dbname= sslmode=disable"
+connectdb: "host=postgres port=5432 user= password= dbname= sslmode=disable"
 tgtoken: ""
 vktoken: ""
+weatherUpdateInfo: 2
+fruityVice: "https://www.fruityvice.com/api/fruit/"
+coinDesk: "https://api.coindesk.com/v1/bpi/currentprice.json"

@@ -22,14 +22,14 @@ func New(db *sql.DB) UniversalRepo {
 }
 
 type UserRepo interface {
-	RegistrUser(messageinfo *model.MessageInfoText)
+	RegistrationUser(messageinfo *model.MessageInfoText)
 	CityChange(city string, chatid int64)
 	GetUserData(chatId int64, platform string) *sql.Rows
 	GetCityOfUser(chatId int64) *sql.Rows
 }
 
 type WheatherRepo interface {
-	SaveWheather(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string)
+	SaveWeather(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string)
 	WeatherByNDays(limit int, city string) *sql.Rows
 	ClearDb()
 }

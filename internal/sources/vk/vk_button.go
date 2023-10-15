@@ -11,7 +11,7 @@ func CreateKeyboardvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Мои данные",
-					Payload: "{\"button\": \"Мои данные\"}",
+					Payload: "{\"buttons\": \"Мои данные\"}",
 				},
 				Color: "primary",
 			},
@@ -19,7 +19,7 @@ func CreateKeyboardvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Прогноз Погоды",
-					Payload: "{\"button\": \"Прогноз погоды\"}",
+					Payload: "{\"buttons\": \"Прогноз погоды\"}",
 				},
 				Color: "primary",
 			},
@@ -29,7 +29,7 @@ func CreateKeyboardvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Калькулятор",
-					Payload: "{\"button\": \"Калькулятор\"}",
+					Payload: "{\"buttons\": \"Калькулятор\"}",
 				},
 				Color: "primary",
 			},
@@ -37,7 +37,7 @@ func CreateKeyboardvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "OPEN API",
-					Payload: "{\"button\": \"OPEN API\"}",
+					Payload: "{\"buttons\": \"OPEN API\"}",
 				},
 				Color: "primary",
 			},
@@ -58,7 +58,7 @@ func createInlineKeyboardDatavk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Показать мои данные",
-					Payload: "{\"button\": \"Показать мои данные\"}",
+					Payload: "{\"buttons\": \"Показать мои данные\"}",
 				},
 				Color: "primary",
 			},
@@ -66,7 +66,7 @@ func createInlineKeyboardDatavk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Изменить город",
-					Payload: "{\"button\": \"Изменить город\"}",
+					Payload: "{\"buttons\": \"Изменить город\"}",
 				},
 				Color: "primary",
 			},
@@ -86,7 +86,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Санкт-Петербург",
-					Payload: "{\"button\": \"city Санкт-Петербург\"}",
+					Payload: "{\"buttons\": \"city Санкт-Петербург\"}",
 				},
 				Color: "primary",
 			},
@@ -94,7 +94,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Москва",
-					Payload: "{\"button\": \"city Москва\"}",
+					Payload: "{\"buttons\": \"city Москва\"}",
 				},
 				Color: "primary",
 			},
@@ -104,7 +104,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Новосибирск",
-					Payload: "{\"button\": \"city Новосибирск\"}",
+					Payload: "{\"buttons\": \"city Новосибирск\"}",
 				},
 				Color: "primary",
 			},
@@ -112,7 +112,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Екатеренбург",
-					Payload: "{\"button\": \"city Екатеренбург\"}",
+					Payload: "{\"buttons\": \"city Екатеренбург\"}",
 				},
 				Color: "primary",
 			},
@@ -122,7 +122,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Казань",
-					Payload: "{\"button\": \"city Казань\"}",
+					Payload: "{\"buttons\": \"city Казань\"}",
 				},
 				Color: "primary",
 			},
@@ -130,7 +130,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Самара",
-					Payload: "{\"button\": \"city Самара\"}",
+					Payload: "{\"buttons\": \"city Самара\"}",
 				},
 				Color: "primary",
 			},
@@ -140,7 +140,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Нижний Новгород",
-					Payload: "{\"button\": \"city Нижний Новгород\"}",
+					Payload: "{\"buttons\": \"city Нижний Новгород\"}",
 				},
 				Color: "primary",
 			},
@@ -148,7 +148,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Ростов",
-					Payload: "{\"button\": \"city Ростов\"}",
+					Payload: "{\"buttons\": \"city Ростов\"}",
 				},
 				Color: "primary",
 			},
@@ -158,7 +158,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Уфа",
-					Payload: "{\"button\": \"city Уфа\"}",
+					Payload: "{\"buttons\": \"city Уфа\"}",
 				},
 				Color: "primary",
 			},
@@ -166,7 +166,7 @@ func createInlineKeyboardCityvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Железногорск(Курская обл.)",
-					Payload: "{\"button\": \"city железногорск\"}",
+					Payload: "{\"buttons\": \"city железногорск\"}",
 				},
 				Color: "primary",
 			},
@@ -186,7 +186,7 @@ func createInlineKeyboardWeathervk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Погода на сегодня",
-					Payload: "{\"button\": \"Погода 1\"}",
+					Payload: "{\"buttons\": \"Погода 1\"}",
 				},
 				Color: "primary",
 			},
@@ -194,7 +194,7 @@ func createInlineKeyboardWeathervk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Погода на 5 дней",
-					Payload: "{\"button\": \"Погода 5\"}",
+					Payload: "{\"buttons\": \"Погода 5\"}",
 				},
 				Color: "primary",
 			},
@@ -204,7 +204,7 @@ func createInlineKeyboardWeathervk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Погода на 10 дней",
-					Payload: "{\"button\": \"Погода 10\"}",
+					Payload: "{\"buttons\": \"Погода 10\"}",
 				},
 				Color: "primary",
 			},
@@ -224,7 +224,7 @@ func createInlineKeyboardCalculatorvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Сложение",
-					Payload: "{\"button\": \"calc +\"}",
+					Payload: "{\"buttons\": \"calc +\"}",
 				},
 				Color: "primary",
 			},
@@ -232,7 +232,7 @@ func createInlineKeyboardCalculatorvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Вычитание",
-					Payload: "{\"button\": \"calc -\"}",
+					Payload: "{\"buttons\": \"calc -\"}",
 				},
 				Color: "primary",
 			},
@@ -242,7 +242,7 @@ func createInlineKeyboardCalculatorvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Умножение",
-					Payload: "{\"button\": \"calc *\"}",
+					Payload: "{\"buttons\": \"calc *\"}",
 				},
 				Color: "primary",
 			},
@@ -250,7 +250,7 @@ func createInlineKeyboardCalculatorvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Деление",
-					Payload: "{\"button\": \"calc /\"}",
+					Payload: "{\"buttons\": \"calc /\"}",
 				},
 				Color: "primary",
 			},
@@ -270,7 +270,7 @@ func createInlineKeyboardOpenAPIvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Узнать курс BTC/USD",
-					Payload: "{\"button\": \"BTC\"}",
+					Payload: "{\"buttons\": \"BTC\"}",
 				},
 				Color: "primary",
 			},
@@ -278,7 +278,7 @@ func createInlineKeyboardOpenAPIvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Калорийность фруктов",
-					Payload: "{\"button\": \"Калорийность фруктов\"}",
+					Payload: "{\"buttons\": \"Калорийность фруктов\"}",
 				},
 				Color: "primary",
 			},
@@ -298,7 +298,7 @@ func createInlineKeyboardFruitsvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Яблоко",
-					Payload: "{\"button\": \"apiFruit apple яблок\"}",
+					Payload: "{\"buttons\": \"apiFruit apple яблок\"}",
 				},
 				Color: "primary",
 			},
@@ -306,7 +306,7 @@ func createInlineKeyboardFruitsvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Банан",
-					Payload: "{\"button\": \"apiFruit Banana бананов\"}",
+					Payload: "{\"buttons\": \"apiFruit Banana бананов\"}",
 				},
 				Color: "primary",
 			},
@@ -316,7 +316,7 @@ func createInlineKeyboardFruitsvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Дыня",
-					Payload: "{\"button\": \"apiFruit Melon дыни\"}",
+					Payload: "{\"buttons\": \"apiFruit Melon дыни\"}",
 				},
 				Color: "primary",
 			},
@@ -324,7 +324,7 @@ func createInlineKeyboardFruitsvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Лимон",
-					Payload: "{\"button\": \"apiFruit Lemon лимона\"}",
+					Payload: "{\"buttons\": \"apiFruit Lemon лимона\"}",
 				},
 				Color: "primary",
 			},
@@ -334,7 +334,7 @@ func createInlineKeyboardFruitsvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Лайм",
-					Payload: "{\"button\": \"apiFruit Lime лайма\"}",
+					Payload: "{\"buttons\": \"apiFruit Lime лайма\"}",
 				},
 				Color: "primary",
 			},
@@ -342,7 +342,7 @@ func createInlineKeyboardFruitsvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Гранат",
-					Payload: "{\"button\": \"apiFruit Pomegranate граната\"}",
+					Payload: "{\"buttons\": \"apiFruit Pomegranate граната\"}",
 				},
 				Color: "primary",
 			},
@@ -352,7 +352,7 @@ func createInlineKeyboardFruitsvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Виноград",
-					Payload: "{\"button\": \"apiFruit Grape винограда\"}",
+					Payload: "{\"buttons\": \"apiFruit Grape винограда\"}",
 				},
 				Color: "primary",
 			},
@@ -360,7 +360,7 @@ func createInlineKeyboardFruitsvk() *object.MessagesKeyboard {
 				Action: object.MessagesKeyboardButtonAction{
 					Type:    "callback",
 					Label:   "Авокадо",
-					Payload: "{\"button\": \"apiFruit Avocado авокадо\"}",
+					Payload: "{\"buttons\": \"apiFruit Avocado авокадо\"}",
 				},
 				Color: "primary",
 			},

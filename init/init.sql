@@ -6,7 +6,7 @@ create table weather_forecast(
     weather     varchar(50),
     pressure    varchar(50),
     humidity    varchar(50),
-    windspeed   varchar(50),
+    windSpeed   varchar(50),
     felt        varchar(50),
     city        varchar(50)
 );

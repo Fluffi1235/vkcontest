@@ -13,17 +13,17 @@ const (
 	Zheleznogorsk  string = "https://yandex.ru/pogoda/ru-RU/details?lat=52.33920288&lon=35.35087204&via=ms"
 )
 
-func City() map[string]string {
-	Citylink := make(map[string]string)
-	Citylink["санкт-петербург"] = Spb
-	Citylink["москва"] = Mosckow
-	Citylink["новосибирск"] = Novosibirsk
-	Citylink["екатеренбург"] = Ekb
-	Citylink["казань"] = Kazan
-	Citylink["самара"] = Samara
-	Citylink["нижний новгород"] = NizhnyNovgorod
-	Citylink["ростов"] = Rostov
-	Citylink["уфа"] = Ufa
-	Citylink["железногорск"] = Zheleznogorsk
-	return Citylink
+func Cities() map[string]string {
+	cities := make(map[string]string)
+	cities["санкт-петербург"] = Spb
+	cities["москва"] = Mosckow
+	cities["новосибирск"] = Novosibirsk
+	cities["екатеренбург"] = Ekb
+	cities["казань"] = Kazan
+	cities["самара"] = Samara
+	cities["нижний новгород"] = NizhnyNovgorod
+	cities["ростов"] = Rostov
+	cities["уфа"] = Ufa
+	cities["железногорск"] = Zheleznogorsk
+	return cities
 }

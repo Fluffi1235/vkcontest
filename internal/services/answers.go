@@ -1,12 +1,15 @@
 package services
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/Fluffi1235/vkcontest/internal/model"
+	"github.com/Fluffi1235/vkcontest/internal/parsers"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"log"
 	"strconv"
 	"strings"
+	"text/template"
 )
 
 type Repository struct {
@@ -20,7 +23,7 @@ func New(repo repository.UniversalRepo) *Repository {
 }
 
 func (r *Repository) AnswerStart() string {
-	answer := fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+	return fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
 		"Привет, я телеграм бот. Мои функции:",
 		"\t1)Вы можете посмотреть свои данные и в случае необходимости изменить город.",
 		"\t2)Посмотреть прогноз погоды в вашем городе до 10 дней. Не забудьте изменить город(город по умолчанию: Москва).",
@@ -29,45 +32,44 @@ func (r *Repository) AnswerStart() string {
 		"\t4)Использовать несколько беспланых API.",
 		"Функцианал API: узнать текущий курс BTC/USD, каллорийность некоторых фруктов.",
 		"Чтобы приступить к работе введите /info")
-	return answer
 }
 
 func (r *Repository) AnswerForCityChange(city string, chatId int64) string {
 	r.repo.CityChange(city, chatId)
-	answer := fmt.Sprintf("%s%s\n%s\n%s",
-		"Ваш город сохранен ", strings.Title(city),
-		"Теперь вы можете смотреть погоду в вашем городе до 10 дней",
-		"Чтобы посмотреть команды введите /info")
-	return answer
+	tmpl := "Ваш город сохранен  {{.}}\nТеперь вы можете смотреть погоду в вашем городе до 10 дней\nЧтобы посмотреть команды введите /info"
+	t := template.Must(template.New("changeCity").Parse(tmpl))
+	var buf bytes.Buffer
+	err := t.Execute(&buf, city)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return buf.String()
 }
 
 func (r *Repository) AnswerUserData(chatId int64, platform string) string {
 	user := model.User{}
+	var buf bytes.Buffer
+	var t *template.Template
 	rowData := r.repo.GetUserData(chatId, platform)
-	var answer string
 	for rowData.Next() {
 		if err := rowData.Scan(&user.ChatId, &user.UserName, &user.City, &user.FirstName, &user.LastName, &user.Platform); err != nil {
 			log.Println(err)
 		}
+		user.City = strings.Title(user.City)
 		if user.Platform == "tg" {
-			answer = fmt.Sprintf("%s\n%s%d\n%s%s\n%s%s\n%s%s\n%s%s",
-				"Ваши данные:",
-				"ChatId: ", user.ChatId,
-				"User Name: @", user.UserName,
-				"Имя: ", user.FirstName,
-				"Фамилия: ", user.LastName,
-				"Город: ", strings.Title(user.City))
+			tmplTG := "Ваши данные:\nChatId: {{.ChatId}}\nUser Name: @{{.UserName}}\nИмя: {{.FirstName}}\nФамилия: {{.LastName}}\nГород: {{.City}}"
+			t = template.Must(template.New("userDataTg").Parse(tmplTG))
 		}
 		if user.Platform == "vk" {
-			answer = fmt.Sprintf("%s\n%s%d\n%s%s\n%s%s\n%s%s",
-				"Ваши данные:",
-				"ChatId: ", user.ChatId,
-				"Имя: ", user.FirstName,
-				"Фамилия: ", user.LastName,
-				"Город: ", strings.Title(user.City))
+			tmplTG := "Ваши данные:\nChatId: {{.ChatId}}\nИмя: {{.FirstName}}\nФамилия: {{.LastName}}\nГород: {{.City}}"
+			t = template.Must(template.New("userDataVk").Parse(tmplTG))
 		}
 	}
-	return answer
+	err := t.Execute(&buf, user)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return buf.String()
 }
 
 func (r *Repository) AnswerWeatherByNDays(limit string, chatid int64) []string {
@@ -76,7 +78,8 @@ func (r *Repository) AnswerWeatherByNDays(limit string, chatid int64) []string {
 		log.Println(err)
 	}
 	var counter int
-	answer := make([]string, 1)
+	arrAnswer := make([]string, 1)
+	answersForDay := ""
 	userCity := r.repo.GetCityOfUser(chatid)
 	defer userCity.Close()
 	var city string
@@ -93,19 +96,47 @@ func (r *Repository) AnswerWeatherByNDays(limit string, chatid int64) []string {
 			&weather.Humidity, &weather.WindSpeed, &weather.Felt, &weather.City); err != nil {
 			log.Println(err)
 		}
-		daystr := weather.Day.Format("2006-01-02")
+		dayFormat := weather.Day.Format("2006-01-02")
 		weather.TimesOfDay = strings.ToUpper(weather.TimesOfDay)
-		if counter%4 == 0 {
-			answer = append(answer, strings.Join([]string{daystr, "\n", weather.TimesOfDay, "\n", weather.Temp, " ", weather.Weather, " Ощущается как ",
-				weather.Felt, "\n", "Давление = ", weather.Pressure, " мм рт.ст., Влажность = ", weather.Humidity, ", Ветер = ", weather.WindSpeed, "м/с\n\n",
-			}, ""))
-		} else {
-			answer = append(answer, strings.Join([]string{
+		if counter < 4 {
+			if counter == 0 {
+				answersForDay += dayFormat + "\n"
+			}
+			answersForDay += strings.Join([]string{
 				weather.TimesOfDay, "\n", weather.Temp, " ", weather.Weather, " Ощущается как ",
 				weather.Felt, "\n", "Давление = ", weather.Pressure, " мм рт.ст., Влажность = ", weather.Humidity, ", Ветер = ", weather.WindSpeed, "м/с\n\n",
-			}, ""))
+			}, "")
+			counter++
+		} else {
+			arrAnswer = append(arrAnswer, answersForDay)
+			counter = 0
 		}
-		counter++
 	}
-	return answer
+	return arrAnswer
+}
+
+func AnswerInfoFruits(fruit string, fruitInfo *parsers.Nutrit) string {
+	infoFruit := struct {
+		Fruit         string
+		Calories      string
+		Fats          string
+		Sugar         string
+		Carbohydrates string
+		Protein       string
+	}{fruit,
+		strconv.FormatFloat(fruitInfo.Calories, 'f', 1, 64),
+		strconv.FormatFloat(fruitInfo.Fats, 'f', 1, 64),
+		strconv.FormatFloat(fruitInfo.Sugar, 'f', 1, 64),
+		strconv.FormatFloat(fruitInfo.Carbohydrates, 'f', 1, 64),
+		strconv.FormatFloat(fruitInfo.Protein, 'f', 1, 64),
+	}
+	tmpl := "Энергетическая ценность {{.Fruit}} на 100г:\nКалорийность {{.Calories}}кк\nПищевая ценность {{.Fruit}} \nЖиры {{.Fats}}г\nСахар {{.Sugar}}г\n" +
+		"Углеводы {{.Carbohydrates}}г\nБелки {{.Protein}}г"
+	t := template.Must(template.New("changeCity").Parse(tmpl))
+	var buf bytes.Buffer
+	err := t.Execute(&buf, infoFruit)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return buf.String()
 }

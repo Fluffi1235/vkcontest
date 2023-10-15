@@ -16,7 +16,7 @@ type TG struct {
 func NewTG(token string) sources.Source {
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Error connection tg")
 	}
 
 	bot.Debug = false
@@ -76,7 +76,7 @@ func (tg *TG) Send(msg string, clientID int64) {
 
 	_, err := tg.bot.Send(tgMsg)
 	if err != nil {
-		log.Printf("%v", err)
+		log.Printf("Error send message %s\n", tg.GetSource())
 	}
 }
 
@@ -86,7 +86,7 @@ func (tg *TG) SendButton(msg string, clientID int64) {
 
 	_, err := tg.bot.Send(tgMsg)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error send keyboard %s\n", tg.GetSource())
 	}
 
 }
@@ -95,7 +95,7 @@ func (tg *TG) EditMessage(infoMsg *model.EditMessage) {
 	editmsg := tgbotapi.NewEditMessageText(infoMsg.ChatId, infoMsg.ButtonMessageId, infoMsg.Answer)
 	_, err := tg.bot.Send(editmsg)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Error edit message %s\n", tg.GetSource())
 	}
 }
 
@@ -117,6 +117,6 @@ func (tg *TG) EditMessageWithButtons(answerInfo *model.EditMessageWithButtons) {
 	}
 	_, err := tg.bot.Send(editmsg)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Error change keyboard %s\n", tg.GetSource())
 	}
 }

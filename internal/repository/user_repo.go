@@ -6,18 +6,18 @@ import (
 	"log"
 )
 
-func (r Repository) RegistrUser(messageinfo *model.MessageInfoText) {
-	rows, err := r.db.Query("SELECT * From Users where chatid = $1", messageinfo.Mi.ChatID)
+func (r Repository) RegistrationUser(messageinfo *model.MessageInfoText) {
+	rows, err := r.db.Query("SELECT chatid, username, city, first_name, last_name, platform From Users where chatid = $1", messageinfo.MessageInfo.ChatID)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, " dao RegistrationUser")
 	}
 	if rows.Next() {
 		return
 	}
 	_, err = r.db.Exec("INSERT INTO Users(chatid, username, city, first_name, last_name, platform) VALUES($1, $2, $3, $4, $5, $6)",
-		messageinfo.Mi.ChatID, messageinfo.UserName, "москва", messageinfo.FirstName, messageinfo.LastName, messageinfo.Mi.Platform)
+		messageinfo.MessageInfo.ChatID, messageinfo.UserName, "москва", messageinfo.FirstName, messageinfo.LastName, messageinfo.MessageInfo.Platform)
 	if err != nil {
-		log.Println("Error inserting into dao RegistrUser")
+		log.Println("Error inserting into dao RegistrationUser")
 	}
 }
 
@@ -39,7 +39,7 @@ func (r Repository) GetUserData(chatId int64, platform string) *sql.Rows {
 func (r Repository) GetCityOfUser(chatId int64) *sql.Rows {
 	row, err := r.db.Query("SELECT city FROM users where chatid = $1", chatId)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, " dao GetCityOfUser")
 	}
 	return row
 }

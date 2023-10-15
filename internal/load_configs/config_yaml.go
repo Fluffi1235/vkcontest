@@ -6,9 +6,12 @@ import (
 )
 
 type Config struct {
-	ConnectDb string `yaml:"connectdb"`
-	TgToken   string `yaml:"tgtoken"`
-	VkToken   string `yaml:"vktoken"`
+	ConnectDb         string `yaml:"connectdb"`
+	TgToken           string `yaml:"tgtoken"`
+	VkToken           string `yaml:"vktoken"`
+	WeatherUpdateInfo int    `yaml:"weatherUpdateInfo"`
+	FruityViceLink    string `yaml:"fruityVice"`
+	CoinDeskLink      string `yaml:"coinDesk"`
 }
 
 func LoadConfigFromYaml() (*Config, error) {

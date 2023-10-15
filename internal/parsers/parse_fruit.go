@@ -2,6 +2,7 @@ package parsers
 
 import (
 	"encoding/json"
+	"github.com/Fluffi1235/vkcontest/internal/load_configs"
 	"log"
 	"net/http"
 )
@@ -11,24 +12,27 @@ type Fruit struct {
 }
 
 type Nutrit struct {
-	Calories       float64 `json:"calories"`
-	Fats           float64 `json:"fats"`
-	Sugar          float64 `json:"sugar"`
-	Carbohyddrates float64 `json:"carbohyddrates"`
-	Protein        float64 `json:"protein"`
+	Calories      float64 `json:"calories"`
+	Fats          float64 `json:"fats"`
+	Sugar         float64 `json:"sugar"`
+	Carbohydrates float64 `json:"carbohydrates"`
+	Protein       float64 `json:"protein"`
 }
 
-func ParseFruit(msg string) Nutrit {
+func ParseFruit(msg string, config *load_configs.Config) Nutrit {
 	fruit := Fruit{}
-	url := "https://www.fruityvice.com/api/fruit/" + msg
+	url := config.FruityViceLink + msg
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error connecting to fruityvice")
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		log.Printf("status code error: %d %s\n", resp.StatusCode, resp.Status)
+	}
 	err = json.NewDecoder(resp.Body).Decode(&fruit)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error in data mapping ParseFruit")
 	}
 	return fruit.Nutritions
 }

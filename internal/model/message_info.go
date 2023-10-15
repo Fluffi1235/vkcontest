@@ -7,15 +7,15 @@ type MessageInfo struct {
 }
 
 type MessageInfoText struct {
-	Mi        MessageInfo
-	Text      string
-	FirstName string
-	LastName  string
-	UserName  string
+	MessageInfo MessageInfo
+	Text        string
+	FirstName   string
+	LastName    string
+	UserName    string
 }
 
 type MessageInfoButton struct {
-	Mi              MessageInfo
+	ButtonInfo      MessageInfo
 	ButtonMessageID int
 	ButtonData      string
 }
@@ -35,7 +35,7 @@ type EditMessageWithButtons struct {
 
 func NewMessageInfoText(source SourceType, platform string, chatId int64, text, userName, firstName, lastName string) *MessageInfoText {
 	return &MessageInfoText{
-		Mi: MessageInfo{
+		MessageInfo: MessageInfo{
 			Source:   source,
 			Platform: platform,
 			ChatID:   chatId,
@@ -49,7 +49,7 @@ func NewMessageInfoText(source SourceType, platform string, chatId int64, text, 
 
 func NewMessageInfoButton(source SourceType, platform string, chatId int64, buttonDate string, ButtonMessageid int) *MessageInfoButton {
 	return &MessageInfoButton{
-		Mi: MessageInfo{
+		ButtonInfo: MessageInfo{
 			Source:   source,
 			Platform: platform,
 			ChatID:   chatId,
