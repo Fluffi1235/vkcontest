@@ -8,9 +8,9 @@ services:
   postgresql:
     image: 'bitnami/postgresql:latest'
     environment:
-      - POSTGRESQL_PASSWORD=
-      - POSTGRESQL_USERNAME=
-      - POSTGRESQL_DATABASE=
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DATABASE=db
     ports:
       - 5432:5432
     networks:
@@ -19,14 +19,14 @@ services:
       - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
 
-  vkcontest-bot:
-    image: vkcontest
-    build:
-      dockerfile: ./Dockerfile
-    networks:
-      - vkcontest
-    restart: always
-    links:
-      - postgresql
-    depends_on:
-      - postgresql
+#  vkcontest-bot:
+#    image: vkcontest
+#    build:
+#      dockerfile: ./Dockerfile
+#    networks:
+#      - vkcontest
+#    restart: always
+#    links:
+#      - postgresql
+#    depends_on:
+#      - postgresql

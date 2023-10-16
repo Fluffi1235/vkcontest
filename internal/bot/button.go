@@ -1,9 +1,8 @@
-package buttons
+package bot
 
 import (
 	"fmt"
-	"github.com/Fluffi1235/vkcontest/internal/bot"
-	"github.com/Fluffi1235/vkcontest/internal/load_configs"
+	"github.com/Fluffi1235/vkcontest/internal/config"
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/services"
 	"log"
@@ -19,7 +18,7 @@ const (
 	fruitInfo       string = "калорийность фруктов"
 )
 
-func HandlingButton(b *bot.Bot, msg *model.MessageInfoButton, service *services.Repository, persons map[int64]rune, config *load_configs.Config) {
+func HandlingButton(b *Bot, msg *model.MessageInfoButton, service *services.Repository, persons map[int64]rune, config *config.Config) {
 	if msg.ButtonData != "" && msg.ButtonMessageID != -1 {
 		log.Printf("Нажата кнопка с данными: %s\n", msg.ButtonData)
 		msg.ButtonData = strings.ToLower(msg.ButtonData)

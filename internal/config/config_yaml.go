@@ -1,8 +1,8 @@
-package load_configs
+package config
 
 import (
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
+	"os"
 )
 
 type Config struct {
@@ -16,7 +16,7 @@ type Config struct {
 
 func LoadConfigFromYaml() (*Config, error) {
 	var conf Config
-	f, err := ioutil.ReadFile("./config/config.yaml")
+	f, err := os.ReadFile("./config/config.yaml")
 	if err != nil {
 		return nil, err
 	}

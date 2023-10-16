@@ -13,9 +13,9 @@ create table weather_forecast(
 
 create table users (
     chatId     bigint primary key,
-    username   varchar(50),
+    userName   varchar(50),
     city       varchar(50),
-    first_name varchar(50),
-    last_name  varchar(50),
+    firstName varchar(50),
+    lastName  varchar(50),
     platform   varchar(50)
 );

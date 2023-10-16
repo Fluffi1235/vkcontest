@@ -45,8 +45,8 @@ func createInlineKeyboardDataUser() *tgbotapi.InlineKeyboardMarkup {
 func createInlineKeyboardCity() *tgbotapi.InlineKeyboardMarkup {
 	var keyboardButtons []tgbotapi.InlineKeyboardButton
 	cities := model.Cities()
-	for city, link := range cities {
-		button := tgbotapi.NewInlineKeyboardButtonData(city, link)
+	for city, _ := range cities {
+		button := tgbotapi.NewInlineKeyboardButtonData(city, "city "+city)
 		keyboardButtons = append(keyboardButtons, button)
 	}
 	row1 := tgbotapi.NewInlineKeyboardRow(keyboardButtons[0:3]...)

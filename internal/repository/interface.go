@@ -1,35 +1,34 @@
 package repository
 
 import (
-	"database/sql"
 	"github.com/Fluffi1235/vkcontest/internal/model"
-	"time"
+	"github.com/jmoiron/sqlx"
 )
 
 type UniversalRepo interface {
 	UserRepo
-	WheatherRepo
+	WeatherRepo
 }
 
 type Repository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func New(db *sql.DB) UniversalRepo {
+func New(db *sqlx.DB) UniversalRepo {
 	return &Repository{
 		db: db,
 	}
 }
 
 type UserRepo interface {
-	RegistrationUser(messageinfo *model.MessageInfoText)
-	CityChange(city string, chatid int64)
-	GetUserData(chatId int64, platform string) *sql.Rows
-	GetCityOfUser(chatId int64) *sql.Rows
+	SetUser(messageInfo *model.MessageInfoText) error
+	UpdateCityOfUser(city string, chatId int64) error
+	GetUserData(chatId int64, platform string) (*model.User, error)
+	GetCityOfUser(chatId int64) (string, error)
 }
 
-type WheatherRepo interface {
-	SaveWeather(date time.Time, timesOfDay, temp, weather, pressure, humidity, windspeed, felt, city string)
-	WeatherByNDays(limit int, city string) *sql.Rows
-	ClearDb()
+type WeatherRepo interface {
+	SaveWeather(weather *model.Weather) error
+	GetWeatherByNDays(limit int, city string) ([]model.Weather, error)
+	ClearDb() error
 }

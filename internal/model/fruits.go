@@ -1,5 +1,14 @@
 package model
 
+type InfoFruit struct {
+	Fruit         string
+	Calories      string
+	Fats          string
+	Sugar         string
+	Carbohydrates string
+	Protein       string
+}
+
 func Fruits() map[string]string {
 	fruits := make(map[string]string)
 	fruits["Яблоко"] = "apiFruit apple яблок"

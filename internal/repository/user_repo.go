@@ -1,45 +1,57 @@
 package repository
 
 import (
-	"database/sql"
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"log"
 )
 
-func (r Repository) RegistrationUser(messageinfo *model.MessageInfoText) {
-	rows, err := r.db.Query("SELECT chatid, username, city, first_name, last_name, platform From Users where chatid = $1", messageinfo.MessageInfo.ChatID)
+func (r Repository) SetUser(messageInfo *model.MessageInfoText) error {
+	rows, err := r.db.Queryx("SELECT chatid, userName, city, firstName, lastName, platform From Users where chatid = $1", messageInfo.MessageInfo.ChatID)
 	if err != nil {
-		log.Println(err, " dao RegistrationUser")
+		log.Println(err, " dao SetUser")
+		return err
 	}
 	if rows.Next() {
-		return
+		return nil
 	}
-	_, err = r.db.Exec("INSERT INTO Users(chatid, username, city, first_name, last_name, platform) VALUES($1, $2, $3, $4, $5, $6)",
-		messageinfo.MessageInfo.ChatID, messageinfo.UserName, "москва", messageinfo.FirstName, messageinfo.LastName, messageinfo.MessageInfo.Platform)
+	query := "INSERT INTO Users(chatid, userName, city, firstName, lastName, platform) VALUES($1, $2, $3, $4, $5, $6)"
+	_, err = r.db.Exec(query,
+		messageInfo.MessageInfo.ChatID, messageInfo.UserName, "москва", messageInfo.FirstName, messageInfo.LastName, messageInfo.MessageInfo.Platform)
 	if err != nil {
-		log.Println("Error inserting into dao RegistrationUser")
+		log.Println(err, "into dao SetUser")
+		return err
 	}
+	return nil
 }
 
-func (r Repository) CityChange(city string, chatid int64) {
-	_, err := r.db.Exec("UPDATE users set city = $1 where chatid = $2", city, chatid)
+func (r Repository) UpdateCityOfUser(city string, chatId int64) error {
+	query := "UPDATE users set city = $1 where chatId = $2"
+	_, err := r.db.Exec(query, city, chatId)
 	if err != nil {
-		log.Println("Error inserting into dao CityChange")
+		log.Println(err, "into dao UpdateCityOfUser")
+		return err
 	}
+	return nil
 }
 
-func (r Repository) GetUserData(chatId int64, platform string) *sql.Rows {
-	row, err := r.db.Query("SELECT * FROM users where chatid = $1 and platform = $2", chatId, platform)
+func (r Repository) GetUserData(chatId int64, platform string) (*model.User, error) {
+	userData := &model.User{}
+	query := "SELECT chatId, userName, firstName, lastName, city, platform FROM users where chatid = $1 and platform = $2"
+	err := r.db.Get(userData, query, chatId, platform)
 	if err != nil {
 		log.Println(err)
+		return nil, err
 	}
-	return row
+	return userData, nil
 }
 
-func (r Repository) GetCityOfUser(chatId int64) *sql.Rows {
-	row, err := r.db.Query("SELECT city FROM users where chatid = $1", chatId)
+func (r Repository) GetCityOfUser(chatId int64) (string, error) {
+	userData := &model.User{}
+	query := "SELECT city FROM users where chatid = $1"
+	err := r.db.Get(userData, query, chatId)
 	if err != nil {
 		log.Println(err, " dao GetCityOfUser")
+		return "", err
 	}
-	return row
+	return userData.City, nil
 }

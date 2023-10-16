@@ -1,8 +1,6 @@
-package Handlings
+package bot
 
 import (
-	"github.com/Fluffi1235/vkcontest/internal/bot"
-	"github.com/Fluffi1235/vkcontest/internal/bot/Handlings/buttons"
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/Fluffi1235/vkcontest/internal/services"
@@ -16,22 +14,19 @@ const (
 	begin string = "начать"
 )
 
-func HandlingText(b *bot.Bot, msg *model.MessageInfoText, service *services.Repository, persons map[int64]rune, repo repository.UniversalRepo) {
+func HandlingText(b *Bot, msg *model.MessageInfoText, service *services.Repository, persons map[int64]rune, repo repository.UniversalRepo) {
 	message := strings.ToLower(msg.Text)
-	answer := buttons.IsTwoNumbers(message, msg.MessageInfo.ChatID, persons)
-	if answer != "" {
+	if answer, err := IsTwoNumbers(message, msg.MessageInfo.ChatID, persons); answer != "" && err == nil {
 		b.Sources[msg.MessageInfo.Source].Send(answer, msg.MessageInfo.ChatID)
 		return
 	}
 	switch message {
 	case start:
-		repo.RegistrationUser(msg)
-		answer = service.AnswerStart()
-		b.Sources[msg.MessageInfo.Source].Send(answer, msg.MessageInfo.ChatID)
+		repo.SetUser(msg)
+		b.Sources[msg.MessageInfo.Source].Send(service.AnswerStart(), msg.MessageInfo.ChatID)
 	case begin:
-		repo.RegistrationUser(msg)
-		answer = service.AnswerStart()
-		b.Sources[msg.MessageInfo.Source].Send(answer, msg.MessageInfo.ChatID)
+		repo.SetUser(msg)
+		b.Sources[msg.MessageInfo.Source].Send(service.AnswerStart(), msg.MessageInfo.ChatID)
 	case info:
 		b.Sources[msg.MessageInfo.Source].SendButton("Выберите функцию", msg.MessageInfo.ChatID)
 	case help:

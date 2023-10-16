@@ -2,9 +2,7 @@ package bot
 
 import (
 	"context"
-	"github.com/Fluffi1235/vkcontest/internal/bot/Handlings"
-	"github.com/Fluffi1235/vkcontest/internal/bot/Handlings/buttons"
-	"github.com/Fluffi1235/vkcontest/internal/load_configs"
+	"github.com/Fluffi1235/vkcontest/internal/config"
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/Fluffi1235/vkcontest/internal/services"
@@ -22,7 +20,7 @@ func NewBot(m map[model.SourceType]sources.Source) Bot {
 	}
 }
 
-func (b *Bot) RunBot(ctx context.Context, wg *sync.WaitGroup, repo repository.UniversalRepo, config *load_configs.Config) {
+func (b *Bot) RunBot(ctx context.Context, wg *sync.WaitGroup, repo repository.UniversalRepo, config *config.Config) {
 	defer wg.Done()
 	msgChanText := make(chan *model.MessageInfoText)
 	msgChanButton := make(chan *model.MessageInfoButton)
@@ -45,14 +43,14 @@ func (b *Bot) HandlingMessage(msgChanText <-chan *model.MessageInfoText, repo re
 	service := services.New(repo)
 	persons := make(map[int64]rune, 0)
 	for msg := range msgChanText {
-		go Handlings.HandlingText(b, msg, service, persons, repo)
+		go HandlingText(b, msg, service, persons, repo)
 	}
 }
 
-func (b *Bot) HandlingButtonMessage(msgChanButton <-chan *model.MessageInfoButton, repo repository.UniversalRepo, config *load_configs.Config) {
+func (b *Bot) HandlingButtonMessage(msgChanButton <-chan *model.MessageInfoButton, repo repository.UniversalRepo, config *config.Config) {
 	service := services.New(repo)
 	persons := make(map[int64]rune, 0)
 	for msg := range msgChanButton {
-		go buttons.HandlingButton(b, msg, service, persons, config)
+		go HandlingButton(b, msg, service, persons, config)
 	}
 }

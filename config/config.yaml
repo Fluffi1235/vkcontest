@@ -1,5 +1,5 @@
-connectdb: "host=postgres port=5432 user= password= dbname= sslmode=disable"
-tgtoken: ""
+connectdb: "host=localhost port=5432 user=user password=password dbname=db sslmode=disable"
+tgtoken: "5867383559:AAGdacPpol95CY8fHohYNbfZ55aYppszsxQ"
 vktoken: ""
 weatherUpdateInfo: 2
 fruityVice: "https://www.fruityvice.com/api/fruit/"
