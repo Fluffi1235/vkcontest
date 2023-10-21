@@ -5,6 +5,7 @@ import (
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/sources"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/pkg/errors"
 	"log"
 )
 
@@ -13,10 +14,10 @@ type TG struct {
 	bot  *tgbotapi.BotAPI
 }
 
-func NewTG(token string) sources.Source {
+func NewTG(token string) (sources.Source, error) {
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
-		log.Printf("Error connection tg")
+		return nil, errors.WithMessage(err, "Error connection tg")
 	}
 
 	bot.Debug = false
@@ -28,7 +29,8 @@ func NewTG(token string) sources.Source {
 
 	updates, err := bot.GetUpdatesChan(u)
 	if err != nil {
-		log.Panic(err)
+		log.Println(err)
+		return nil, errors.Wrap(err, "[tg NewTG]")
 	}
 
 	tg := &TG{
@@ -36,7 +38,7 @@ func NewTG(token string) sources.Source {
 		bot:  bot,
 	}
 
-	return tg
+	return tg, nil
 }
 
 func (tg *TG) Read(ctx context.Context, msgChanText chan<- *model.MessageInfoText, msgChanButton chan<- *model.MessageInfoButton) {
@@ -71,52 +73,55 @@ func (tg *TG) GetSource() model.SourceType {
 	return model.Telegram
 }
 
-func (tg *TG) Send(msg string, clientID int64) {
+func (tg *TG) Send(msg string, clientID int64) error {
 	tgMsg := tgbotapi.NewMessage(clientID, msg)
 
 	_, err := tg.bot.Send(tgMsg)
 	if err != nil {
-		log.Printf("Error send message %s\n", tg.GetSource())
+		return errors.WithMessagef(err, "[tg]Error send message\n")
 	}
+	return nil
 }
 
-func (tg *TG) SendButton(msg string, clientID int64) {
+func (tg *TG) SendButton(msg string, clientID int64) error {
 	tgMsg := tgbotapi.NewMessage(clientID, msg)
 	tgMsg.ReplyMarkup = createInlineKeyboardInfo()
 
 	_, err := tg.bot.Send(tgMsg)
 	if err != nil {
-		log.Printf("Error send keyboard %s\n", tg.GetSource())
+		return errors.WithMessagef(err, "[tg]Error send keyboard\n")
 	}
-
+	return nil
 }
 
-func (tg *TG) EditMessage(infoMsg *model.EditMessage) {
-	editmsg := tgbotapi.NewEditMessageText(infoMsg.ChatId, infoMsg.ButtonMessageId, infoMsg.Answer)
-	_, err := tg.bot.Send(editmsg)
+func (tg *TG) EditMessage(infoMsg *model.EditMessage) error {
+	editMsg := tgbotapi.NewEditMessageText(infoMsg.ChatId, infoMsg.ButtonMessageId, infoMsg.Answer)
+	_, err := tg.bot.Send(editMsg)
 	if err != nil {
-		log.Printf("Error edit message %s\n", tg.GetSource())
+		return errors.WithMessagef(err, "[tg]Error edit message\n")
 	}
+	return nil
 }
 
-func (tg *TG) EditMessageWithButtons(answerInfo *model.EditMessageWithButtons) {
-	editmsg := tgbotapi.NewEditMessageText(answerInfo.ChatId, answerInfo.ButtonMessageId, answerInfo.Answer)
+func (tg *TG) EditMessageWithButtons(answerInfo *model.EditMessageWithButtons) error {
+	editMsg := tgbotapi.NewEditMessageText(answerInfo.ChatId, answerInfo.ButtonMessageId, answerInfo.Answer)
 	switch answerInfo.ButtonData {
 	case "мои данные":
-		editmsg.ReplyMarkup = createInlineKeyboardDataUser()
+		editMsg.ReplyMarkup = createInlineKeyboardDataUser()
 	case "прогноз погоды":
-		editmsg.ReplyMarkup = createInlineKeyboardWeather()
+		editMsg.ReplyMarkup = createInlineKeyboardWeather()
 	case "калькулятор":
-		editmsg.ReplyMarkup = createInlineKeyboardCalculator()
+		editMsg.ReplyMarkup = createInlineKeyboardCalculator()
 	case "open api":
-		editmsg.ReplyMarkup = createInlineKeyboardOpenAPI()
+		editMsg.ReplyMarkup = createInlineKeyboardOpenAPI()
 	case "калорийность фруктов":
-		editmsg.ReplyMarkup = createInlineKeyboardFruits()
+		editMsg.ReplyMarkup = createInlineKeyboardFruits()
 	case "изменить город":
-		editmsg.ReplyMarkup = createInlineKeyboardCity()
+		editMsg.ReplyMarkup = createInlineKeyboardCity()
 	}
-	_, err := tg.bot.Send(editmsg)
+	_, err := tg.bot.Send(editMsg)
 	if err != nil {
-		log.Printf("Error change keyboard %s\n", tg.GetSource())
+		return errors.WithMessage(err, "[tg]Error change keyboard\n")
 	}
+	return nil
 }

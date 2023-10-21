@@ -7,6 +7,7 @@ import (
 	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/Fluffi1235/vkcontest/internal/services"
 	"github.com/Fluffi1235/vkcontest/internal/sources"
+	"log"
 	"sync"
 )
 
@@ -43,7 +44,12 @@ func (b *Bot) HandlingMessage(msgChanText <-chan *model.MessageInfoText, repo re
 	service := services.New(repo)
 	persons := make(map[int64]rune, 0)
 	for msg := range msgChanText {
-		go HandlingText(b, msg, service, persons, repo)
+		go func(msg *model.MessageInfoText, service *services.Repository, persons map[int64]rune, repo repository.UniversalRepo) {
+			err := b.HandlingText(msg, service, persons, repo)
+			if err != nil {
+				log.Println(err)
+			}
+		}(msg, service, persons, repo)
 	}
 }
 
@@ -51,6 +57,11 @@ func (b *Bot) HandlingButtonMessage(msgChanButton <-chan *model.MessageInfoButto
 	service := services.New(repo)
 	persons := make(map[int64]rune, 0)
 	for msg := range msgChanButton {
-		go HandlingButton(b, msg, service, persons, config)
+		go func(msg *model.MessageInfoButton, service *services.Repository, persons map[int64]rune, repo repository.UniversalRepo) {
+			err := b.HandlingButton(msg, service, persons, config)
+			if err != nil {
+				log.Println(err)
+			}
+		}(msg, service, persons, repo)
 	}
 }

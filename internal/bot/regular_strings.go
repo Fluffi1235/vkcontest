@@ -5,7 +5,7 @@ import (
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/parsers"
 	"github.com/Fluffi1235/vkcontest/internal/services"
-	"log"
+	"github.com/pkg/errors"
 	"regexp"
 	"strconv"
 	"strings"
@@ -16,8 +16,7 @@ func DataUser(msg string, chatId int64, servise *services.Repository, platform s
 
 	checkPrefData, err := regexp.MatchString("показать мои данные", msg)
 	if err != nil {
-		log.Println(err)
-		return "", err
+		return "", errors.Wrap(err, "[Regular DataUser]")
 	}
 	if checkPrefData {
 		answer, err = servise.AnswerUserData(chatId, platform)
@@ -36,8 +35,7 @@ func CheckCity(msg string, chatId int64, servise *services.Repository) (string, 
 	for k := range cities {
 		checkPrefDay, err := regexp.MatchString("city .+", msg)
 		if err != nil {
-			log.Println(err)
-			return "", err
+			return "", errors.Wrap(err, "[Regular CheckCity]")
 		}
 		if checkPrefDay {
 			city = strings.Split(msg, "city ")[1]
@@ -59,8 +57,7 @@ func WeatherOnNDays(msg string, chatId int64, servise *services.Repository) ([]s
 	arrAnswer := make([]string, 0)
 	checkPrefInterval, err := regexp.MatchString("погода \\d{1,10}", msg)
 	if err != nil {
-		log.Println(err)
-		return nil, err
+		return nil, errors.Wrap(err, "[Regular WeatherOnNDays]")
 	}
 	if checkPrefInterval {
 		msgSplit := strings.Split(msg, " ")
@@ -68,7 +65,6 @@ func WeatherOnNDays(msg string, chatId int64, servise *services.Repository) ([]s
 		if err != nil {
 			return nil, err
 		}
-		return arrAnswer, nil
 	}
 	return arrAnswer, nil
 }
@@ -76,8 +72,7 @@ func WeatherOnNDays(msg string, chatId int64, servise *services.Repository) ([]s
 func Calculator(msg string, chatId int64, person map[int64]rune) (bool, error) {
 	checkPrefCalc, err := regexp.MatchString("calc [-+*/]", msg)
 	if err != nil {
-		log.Println(err, "in Calculator")
-		return false, err
+		return false, errors.Wrap(err, "[Regular Calculator]")
 	}
 	if checkPrefCalc {
 		symbol := msg[len(msg)-1]
@@ -94,8 +89,7 @@ func IsTwoNumbers(msg string, chatId int64, person map[int64]rune) (string, erro
 	var num2 float64
 	checkPrefTwoNumbers, err := regexp.MatchString("[-]?\\d+[.,]?\\d* [-]?\\d+[.,]?\\d*", msg)
 	if err != nil {
-		log.Println(err, "in IsTwoNumbers")
-		return "", err
+		return answer, errors.Wrap(err, "[IsTwoNumbers]")
 	}
 	if checkPrefTwoNumbers {
 		msgSplit := strings.Split(msg, " ")
@@ -103,13 +97,11 @@ func IsTwoNumbers(msg string, chatId int64, person map[int64]rune) (string, erro
 		msgSplit[1] = strings.ReplaceAll(msgSplit[1], ",", ".")
 		num1, err = strconv.ParseFloat(msgSplit[0], 64)
 		if err != nil {
-			log.Println(err, "in IsTwoNumbers")
-			return "", err
+			return answer, errors.Wrap(err, "[IsTwoNumbers]")
 		}
 		num2, err = strconv.ParseFloat(msgSplit[1], 64)
 		if err != nil {
-			log.Println(err, "in IsTwoNumbers")
-			return "", err
+			return answer, errors.Wrap(err, "[IsTwoNumbers]")
 		}
 		switch person[chatId] {
 		case '+':
@@ -137,39 +129,33 @@ func InfoFruits(msg string, config *config.Config) (string, error) {
 	var fruitInfo *parsers.Nutrit
 	checkPrefFruit, err := regexp.MatchString("apifruit .+", msg)
 	if err != nil {
-		log.Println(err, "in InfoFruits")
-		return "", err
+		return answer, errors.Wrap(err, "[Regular InfoFruits]")
 	}
 	if checkPrefFruit {
 		fruit := strings.Split(msg, " ")
 		fruitInfo, err = parsers.ParseFruit(fruit[1], config)
 		if err != nil {
-			log.Println(err, "in InfoFruits")
-			return "", err
+			return answer, err
 		}
 		answer, err = services.AnswerInfoFruits(fruit[2], fruitInfo)
 		if err != nil {
-			return "", err
+			return answer, err
 		}
-		return answer, nil
 	}
-	return "", nil
+	return answer, nil
 }
 
 func Btc(msg string, config *config.Config) (string, error) {
 	var answer string
 	checkPrefBtc, err := regexp.MatchString("btc", msg)
 	if err != nil {
-		log.Println(err, "in Btc")
-		return "", err
+		return answer, errors.Wrap(err, "[Regular Btc]")
 	}
 	if checkPrefBtc {
 		answer, err = parsers.ParseBtc(config)
 		if err != nil {
-			log.Println(err, "in Btc")
-			return "", err
+			return answer, err
 		}
-		return answer, nil
 	}
 	return answer, nil
 }

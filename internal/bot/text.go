@@ -9,29 +9,37 @@ import (
 
 const (
 	start string = "/start"
+	begin string = "начать"
 	info  string = "/info"
 	help  string = "/help"
-	begin string = "начать"
 )
 
-func HandlingText(b *Bot, msg *model.MessageInfoText, service *services.Repository, persons map[int64]rune, repo repository.UniversalRepo) {
+func (b *Bot) HandlingText(msg *model.MessageInfoText, service *services.Repository, persons map[int64]rune, repo repository.UniversalRepo) error {
+	var err error
+	var answer string
 	message := strings.ToLower(msg.Text)
-	if answer, err := IsTwoNumbers(message, msg.MessageInfo.ChatID, persons); answer != "" && err == nil {
-		b.Sources[msg.MessageInfo.Source].Send(answer, msg.MessageInfo.ChatID)
-		return
+	if answer, err = IsTwoNumbers(message, msg.MessageInfo.ChatID, persons); answer != "" {
+		err = b.Sources[msg.MessageInfo.Source].Send(answer, msg.MessageInfo.ChatID)
 	}
 	switch message {
 	case start:
-		repo.SetUser(msg)
-		b.Sources[msg.MessageInfo.Source].Send(service.AnswerStart(), msg.MessageInfo.ChatID)
+		err = repo.SetUser(msg)
+		if err != nil {
+			return err
+		}
+		err = b.Sources[msg.MessageInfo.Source].Send(service.AnswerStart(), msg.MessageInfo.ChatID)
 	case begin:
-		repo.SetUser(msg)
-		b.Sources[msg.MessageInfo.Source].Send(service.AnswerStart(), msg.MessageInfo.ChatID)
+		err = repo.SetUser(msg)
+		if err != nil {
+			return err
+		}
+		err = b.Sources[msg.MessageInfo.Source].Send(service.AnswerStart(), msg.MessageInfo.ChatID)
 	case info:
-		b.Sources[msg.MessageInfo.Source].SendButton("Выберите функцию", msg.MessageInfo.ChatID)
+		err = b.Sources[msg.MessageInfo.Source].SendButton("Выберите функцию", msg.MessageInfo.ChatID)
 	case help:
-		b.Sources[msg.MessageInfo.Source].Send("Чтобы узнать какие команды есть введите /info", msg.MessageInfo.ChatID)
+		err = b.Sources[msg.MessageInfo.Source].Send("Чтобы узнать какие команды есть введите /info", msg.MessageInfo.ChatID)
 	default:
-		b.Sources[msg.MessageInfo.Source].Send("Что то пошло не так, попробуйте еще раз /info", msg.MessageInfo.ChatID)
+		err = b.Sources[msg.MessageInfo.Source].Send("Что то пошло не так, попробуйте еще раз /info", msg.MessageInfo.ChatID)
 	}
+	return err
 }

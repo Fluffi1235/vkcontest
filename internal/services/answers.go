@@ -5,6 +5,7 @@ import (
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/parsers"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
+	"github.com/pkg/errors"
 	"log"
 	"strconv"
 	"strings"
@@ -43,17 +44,22 @@ func (r *Repository) AnswerStart() string {
 	return start
 }
 
+var changeCityTemplate = template.Must(template.New("changeCity").Parse(tmplChangeCity))
+var userDataTgTemplate = template.Must(template.New("userDataTg").Parse(tmplUserTG))
+var userDataVkTemplate = template.Must(template.New("userDataVk").Parse(tmplUserVk))
+var weatherTemplate = template.Must(template.New("infoFruits").Parse(tmplWeather))
+var fruitsTemplate = template.Must(template.New("infoFruit").Parse(tmplInfoFruit))
+
 func (r *Repository) AnswerForCityChange(city string, chatId int64) (string, error) {
 	err := r.repo.UpdateCityOfUser(city, chatId)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "[AnswerForCityChange]")
 	}
-	t := template.Must(template.New("changeCity").Parse(tmplChangeCity))
 	var buf bytes.Buffer
-	err = t.Execute(&buf, city)
+	err = changeCityTemplate.Execute(&buf, city)
 	if err != nil {
 		log.Println(err)
-		return "", err
+		return "", errors.Wrap(err, "[AnswerForCityChange]")
 	}
 	return buf.String(), nil
 }
@@ -63,42 +69,39 @@ func (r *Repository) AnswerUserData(chatId int64, platform string) (string, erro
 	var t *template.Template
 	userData, err := r.repo.GetUserData(chatId, platform)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "[AnswerUserData]")
 	}
 	userData.City = strings.ToTitle(userData.City)
-	if userData.Platform == "tg" {
-		t = template.Must(template.New("userDataTg").Parse(tmplUserTG))
-	}
-	if userData.Platform == "vk" {
-		t = template.Must(template.New("userDataVk").Parse(tmplUserVk))
+	switch userData.Platform {
+	case "tg":
+		t = userDataTgTemplate
+	case "vk":
+		t = userDataVkTemplate
 	}
 	err = t.Execute(&buf, userData)
 	if err != nil {
-		log.Println(err)
-		return "", err
+		return "", errors.Wrap(err, "[AnswerUserData]")
 	}
 	return buf.String(), nil
 }
 
 func (r *Repository) AnswerWeatherByNDays(limit string, chatId int64) ([]string, error) {
+	var counter int
+	var answersForDay string
+	var buf bytes.Buffer
+	arrAnswer := make([]string, 1)
 	amountDays, err := strconv.Atoi(limit)
 	if err != nil {
-		log.Println(err, "in AnswerWeatherByNDays")
-		return nil, err
+		return nil, errors.Wrap(err, "[AnswerWeatherByNDays]")
 	}
-	var counter int
-	arrAnswer := make([]string, 1)
-	answersForDay := ""
 	userCity, err := r.repo.GetCityOfUser(chatId)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "[AnswerWeatherByNDays]")
 	}
 	weather, err := r.repo.GetWeatherByNDays(amountDays, userCity)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "[AnswerWeatherByNDays]")
 	}
-	t := template.Must(template.New("infoFruits").Parse(tmplWeather))
-	var buf bytes.Buffer
 	for i := 0; i < len(weather); i++ {
 		dayFormat := weather[i].Data.Format("2006-01-02")
 		weather[i].TimesOfDay = strings.ToUpper(weather[i].TimesOfDay)
@@ -106,9 +109,9 @@ func (r *Repository) AnswerWeatherByNDays(limit string, chatId int64) ([]string,
 			if counter == 0 {
 				answersForDay += dayFormat + "\n"
 			}
-			err = t.Execute(&buf, weather[i])
+			err = weatherTemplate.Execute(&buf, weather[i])
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrap(err, "[AnswerWeatherByNDays]")
 			}
 			answersForDay += buf.String()
 			counter++
@@ -129,12 +132,10 @@ func AnswerInfoFruits(fruit string, fruitInfo *parsers.Nutrit) (string, error) {
 		Carbohydrates: strconv.FormatFloat(fruitInfo.Carbohydrates, 'f', 1, 64),
 		Protein:       strconv.FormatFloat(fruitInfo.Protein, 'f', 1, 64),
 	}
-	t := template.Must(template.New("infoFruits").Parse(tmplInfoFruit))
 	var buf bytes.Buffer
-	err := t.Execute(&buf, infoFruit)
+	err := fruitsTemplate.Execute(&buf, infoFruit)
 	if err != nil {
-		log.Println(err, "in AnswerInfoFruits")
-		return "", err
+		return "", errors.Wrap(err, "[AnswerInfoFruits]")
 	}
 	return buf.String(), nil
 }

@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/Fluffi1235/vkcontest/internal/bot"
+	Bot "github.com/Fluffi1235/vkcontest/internal/bot"
 	"github.com/Fluffi1235/vkcontest/internal/config"
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/parsers"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/Fluffi1235/vkcontest/internal/sources"
-	"github.com/Fluffi1235/vkcontest/internal/sources/tg"
+	TG "github.com/Fluffi1235/vkcontest/internal/sources/tg"
+	VK "github.com/Fluffi1235/vkcontest/internal/sources/vk"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
@@ -18,7 +19,7 @@ import (
 func main() {
 	cfg, err := config.LoadConfigFromYaml()
 	if err != nil {
-		log.Fatal("Error connecting to database")
+		log.Fatal("Error reading config")
 	}
 
 	db, err := sqlx.Connect("postgres", cfg.ConnectDb)
@@ -28,16 +29,33 @@ func main() {
 	defer db.Close()
 
 	repo := repository.New(db)
-	go parsers.New(repo).ParsWeather(cfg.WeatherUpdateInfo)
+	wg := &sync.WaitGroup{}
+
+	go func(wg *sync.WaitGroup) {
+		wg.Add(1)
+		err = parsers.New(repo).ParsWeather(cfg.WeatherUpdateInfo, wg)
+		if err != nil {
+			log.Println(err)
+		}
+	}(wg)
 
 	ctx := context.Background()
 
-	bot := bot.NewBot(map[model.SourceType]sources.Source{
-		model.Telegram: tg.NewTG(cfg.TgToken),
-		//model.Vk:       vk.NewVK(cfg.VkToken),
+	tg, err := TG.NewTG(cfg.TgToken)
+	if err != nil {
+		log.Println(err)
+	}
+
+	vk, err := VK.NewVK(cfg.VkToken)
+	if err != nil {
+		log.Println(err)
+	}
+
+	bot := Bot.NewBot(map[model.SourceType]sources.Source{
+		model.Telegram: tg,
+		model.Vk:       vk,
 	})
 
-	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go bot.RunBot(ctx, wg, repo, cfg)
 	wg.Wait()

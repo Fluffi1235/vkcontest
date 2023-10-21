@@ -2,14 +2,13 @@ package repository
 
 import (
 	"github.com/Fluffi1235/vkcontest/internal/model"
-	"log"
+	"github.com/pkg/errors"
 )
 
 func (r Repository) SetUser(messageInfo *model.MessageInfoText) error {
 	rows, err := r.db.Queryx("SELECT chatid, userName, city, firstName, lastName, platform From Users where chatid = $1", messageInfo.MessageInfo.ChatID)
 	if err != nil {
-		log.Println(err, " dao SetUser")
-		return err
+		return errors.Wrap(err, "[Dao SetUser Select]")
 	}
 	if rows.Next() {
 		return nil
@@ -18,8 +17,7 @@ func (r Repository) SetUser(messageInfo *model.MessageInfoText) error {
 	_, err = r.db.Exec(query,
 		messageInfo.MessageInfo.ChatID, messageInfo.UserName, "москва", messageInfo.FirstName, messageInfo.LastName, messageInfo.MessageInfo.Platform)
 	if err != nil {
-		log.Println(err, "into dao SetUser")
-		return err
+		return errors.Wrap(err, "[Dao SetUser Insert]")
 	}
 	return nil
 }
@@ -28,8 +26,7 @@ func (r Repository) UpdateCityOfUser(city string, chatId int64) error {
 	query := "UPDATE users set city = $1 where chatId = $2"
 	_, err := r.db.Exec(query, city, chatId)
 	if err != nil {
-		log.Println(err, "into dao UpdateCityOfUser")
-		return err
+		return errors.Wrap(err, "[Dao UpdateCityOfUser Update]")
 	}
 	return nil
 }
@@ -39,8 +36,7 @@ func (r Repository) GetUserData(chatId int64, platform string) (*model.User, err
 	query := "SELECT chatId, userName, firstName, lastName, city, platform FROM users where chatid = $1 and platform = $2"
 	err := r.db.Get(userData, query, chatId, platform)
 	if err != nil {
-		log.Println(err)
-		return nil, err
+		return nil, errors.Wrap(err, "[Dao GetUserData Select]")
 	}
 	return userData, nil
 }
@@ -50,8 +46,7 @@ func (r Repository) GetCityOfUser(chatId int64) (string, error) {
 	query := "SELECT city FROM users where chatid = $1"
 	err := r.db.Get(userData, query, chatId)
 	if err != nil {
-		log.Println(err, " dao GetCityOfUser")
-		return "", err
+		return "", errors.Wrap(err, "[Dao GetCityOfUser Select]")
 	}
 	return userData.City, nil
 }

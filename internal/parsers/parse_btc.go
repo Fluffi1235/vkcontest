@@ -3,9 +3,8 @@ package parsers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/Fluffi1235/vkcontest/internal/config"
-	"log"
+	"github.com/pkg/errors"
 	"net/http"
 	"time"
 )
@@ -27,23 +26,17 @@ func ParseBtc(config *config.Config) (string, error) {
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, "GET", config.CoinDeskLink, nil)
 	if err != nil {
-		fmt.Println("Ошибка при создании запроса coinDesk:", err)
-		return "", err
+		return "", errors.Wrap(err, "Error NewRequestWithContext in ParseBtc")
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Println("Error connecting to coinDesk")
-		return "", err
+		return "", errors.WithMessagef(err, "Error connecting to coinDesk, status code: %d %s\n", resp.StatusCode, resp.Status)
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		log.Printf("status code error: %d %s\n", resp.StatusCode, resp.Status)
-	}
 	curse := Btc{}
 	err = json.NewDecoder(resp.Body).Decode(&curse)
 	if err != nil {
-		log.Println("Error in data mapping ParseBtc")
-		return "", err
+		return "", errors.Wrap(err, "Error in data mapping ParseBtc")
 	}
 
 	return curse.Bpi.Usd.Rt, nil

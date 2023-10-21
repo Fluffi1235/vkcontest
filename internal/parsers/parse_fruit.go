@@ -3,9 +3,8 @@ package parsers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/Fluffi1235/vkcontest/internal/config"
-	"log"
+	"github.com/pkg/errors"
 	"net/http"
 	"time"
 )
@@ -29,19 +28,16 @@ func ParseFruit(msg string, config *config.Config) (*Nutrit, error) {
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		fmt.Println("Ошибка при создании запроса coinDesk:", err)
-		return nil, err
+		return nil, errors.Wrap(err, "Error NewRequestWithContext in ParseBtc")
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Printf("Error connecting to fruityvice, status code error: %d %s\n", resp.StatusCode, resp.Status)
-		return nil, err
+		return nil, errors.WithMessagef(err, "Error connecting to fruityvice, status code error: %d %s\n", resp.StatusCode, resp.Status)
 	}
 	defer resp.Body.Close()
 	err = json.NewDecoder(resp.Body).Decode(&fruit)
 	if err != nil {
-		log.Println("Error in data mapping ParseFruit")
-		return nil, err
+		return nil, errors.Wrap(err, "Error in data mapping ParseFruit")
 	}
 	return &fruit.Nutritions, nil
 }

@@ -7,9 +7,9 @@ import (
 
 type Source interface {
 	Read(ctx context.Context, msgChanText chan<- *model.MessageInfoText, msgChanButton chan<- *model.MessageInfoButton)
-	Send(msg string, clientID int64)
+	Send(msg string, clientID int64) error
 	GetSource() model.SourceType
-	SendButton(msg string, clientID int64)
-	EditMessage(answerInfo *model.EditMessage)
-	EditMessageWithButtons(answerInfo *model.EditMessageWithButtons)
+	SendButton(msg string, clientID int64) error
+	EditMessage(answerInfo *model.EditMessage) error
+	EditMessageWithButtons(answerInfo *model.EditMessageWithButtons) error
 }

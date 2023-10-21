@@ -8,6 +8,7 @@ import (
 	"github.com/SevereCloud/vksdk/v2/api/params"
 	"github.com/SevereCloud/vksdk/v2/events"
 	"github.com/SevereCloud/vksdk/v2/longpoll-bot"
+	"github.com/pkg/errors"
 	"log"
 	"strconv"
 )
@@ -21,7 +22,7 @@ type VK struct {
 	bot    *api.VK
 }
 
-func NewVK(token string) sources.Source {
+func NewVK(token string) (sources.Source, error) {
 	vk := api.NewVK(token)
 	group, err := vk.GroupsGetByID(nil)
 	if err != nil {
@@ -43,7 +44,7 @@ func NewVK(token string) sources.Source {
 		bot:    vk,
 	}
 
-	return Vk
+	return Vk, nil
 }
 
 func (vk *VK) Read(ctx context.Context, msgChanText chan<- *model.MessageInfoText, msgChanButton chan<- *model.MessageInfoButton) {
@@ -63,7 +64,7 @@ func (vk *VK) Read(ctx context.Context, msgChanText chan<- *model.MessageInfoTex
 				vkUsers["user_ids"] = userIDs
 				userInfo, err := vk.bot.UsersGet(vkUsers)
 				if err != nil {
-					log.Printf("Error getting message info %s: %v\n", vk.GetSource(), err)
+					log.Printf("[vk]Error getting message info %s: %v\n", vk.GetSource(), err)
 				}
 				if obj.Message.Text != "" {
 					if len(userInfo) > 0 {
@@ -84,7 +85,7 @@ func (vk *VK) Read(ctx context.Context, msgChanText chan<- *model.MessageInfoTex
 				if obj.Payload != nil {
 					buttonBit, err := obj.Payload.MarshalJSON()
 					if err != nil {
-						log.Printf("Error getting buttons info %s: %v\n", vk.GetSource(), err)
+						log.Printf("[vk]Error getting buttons info %s: %v\n", vk.GetSource(), err)
 					}
 					msg := model.NewMessageInfoButton(
 						vk.GetSource(),
@@ -108,7 +109,7 @@ func (vk *VK) GetSource() model.SourceType {
 	return model.Vk
 }
 
-func (vk *VK) Send(msg string, clientID int64) {
+func (vk *VK) Send(msg string, clientID int64) error {
 	b := params.NewMessagesSendBuilder()
 	b.Message(msg)
 	b.RandomID(0)
@@ -116,10 +117,12 @@ func (vk *VK) Send(msg string, clientID int64) {
 	_, err := vk.bot.MessagesSend(b.Params)
 	if err != nil {
 		log.Printf("Error send message %s\n", vk.GetSource())
+		return errors.WithMessagef(err, "[vk]Error send message\n")
 	}
+	return nil
 }
 
-func (vk *VK) SendButton(msg string, clientID int64) {
+func (vk *VK) SendButton(msg string, clientID int64) error {
 	b := params.NewMessagesSendBuilder()
 	b.Message(msg)
 	b.RandomID(0)
@@ -127,22 +130,24 @@ func (vk *VK) SendButton(msg string, clientID int64) {
 	b.Keyboard(CreateKeyboardvk())
 	_, err := vk.bot.MessagesSend(b.Params)
 	if err != nil {
-		log.Printf("Error send keyboard %s\n", vk.GetSource())
+		return errors.WithMessagef(err, "[vk]Error send keyboard\n")
 	}
+	return nil
 }
 
-func (vk *VK) EditMessage(infoMsg *model.EditMessage) {
+func (vk *VK) EditMessage(infoMsg *model.EditMessage) error {
 	b := params.NewMessagesSendBuilder()
 	b.Message(infoMsg.Answer)
 	b.RandomID(0)
 	b.PeerID(int(infoMsg.ChatId))
 	_, err := vk.bot.MessagesSend(b.Params)
 	if err != nil {
-		log.Printf("Error edit message %s\n", vk.GetSource())
+		return errors.WithMessagef(err, "[vk]Error edit message\n")
 	}
+	return nil
 }
 
-func (vk *VK) EditMessageWithButtons(answerInfo *model.EditMessageWithButtons) {
+func (vk *VK) EditMessageWithButtons(answerInfo *model.EditMessageWithButtons) error {
 	b := params.NewMessagesSendBuilder()
 	switch answerInfo.ButtonData {
 	case "мои данные":
@@ -163,6 +168,7 @@ func (vk *VK) EditMessageWithButtons(answerInfo *model.EditMessageWithButtons) {
 	b.PeerID(int(answerInfo.ChatId))
 	_, err := vk.bot.MessagesSend(b.Params)
 	if err != nil {
-		log.Printf("Error change keyboard %s\n", vk.GetSource())
+		return errors.WithMessage(err, "[vk]Error change keyboard\n")
 	}
+	return nil
 }
