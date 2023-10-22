@@ -17,6 +17,7 @@ func DataUser(msg string, chatId int64, servise *services.Repository, platform s
 	checkPrefData, err := regexp.MatchString("показать мои данные", msg)
 	if err != nil {
 		return "", errors.Wrap(err, "[Regular DataUser]")
+
 	}
 	if checkPrefData {
 		answer, err = servise.AnswerUserData(chatId, platform)
@@ -35,7 +36,7 @@ func CheckCity(msg string, chatId int64, servise *services.Repository) (string, 
 	for k := range cities {
 		checkPrefDay, err := regexp.MatchString("city .+", msg)
 		if err != nil {
-			return "", errors.Wrap(err, "[Regular CheckCity]")
+			return "", err
 		}
 		if checkPrefDay {
 			city = strings.Split(msg, "city ")[1]
@@ -57,7 +58,7 @@ func WeatherOnNDays(msg string, chatId int64, servise *services.Repository) ([]s
 	arrAnswer := make([]string, 0)
 	checkPrefInterval, err := regexp.MatchString("погода \\d{1,10}", msg)
 	if err != nil {
-		return nil, errors.Wrap(err, "[Regular WeatherOnNDays]")
+		return nil, err
 	}
 	if checkPrefInterval {
 		msgSplit := strings.Split(msg, " ")
@@ -72,7 +73,7 @@ func WeatherOnNDays(msg string, chatId int64, servise *services.Repository) ([]s
 func Calculator(msg string, chatId int64, person map[int64]rune) (bool, error) {
 	checkPrefCalc, err := regexp.MatchString("calc [-+*/]", msg)
 	if err != nil {
-		return false, errors.Wrap(err, "[Regular Calculator]")
+		return false, err
 	}
 	if checkPrefCalc {
 		symbol := msg[len(msg)-1]
@@ -89,7 +90,7 @@ func IsTwoNumbers(msg string, chatId int64, person map[int64]rune) (string, erro
 	var num2 float64
 	checkPrefTwoNumbers, err := regexp.MatchString("[-]?\\d+[.,]?\\d* [-]?\\d+[.,]?\\d*", msg)
 	if err != nil {
-		return answer, errors.Wrap(err, "[IsTwoNumbers]")
+		return "", err
 	}
 	if checkPrefTwoNumbers {
 		msgSplit := strings.Split(msg, " ")
@@ -97,11 +98,11 @@ func IsTwoNumbers(msg string, chatId int64, person map[int64]rune) (string, erro
 		msgSplit[1] = strings.ReplaceAll(msgSplit[1], ",", ".")
 		num1, err = strconv.ParseFloat(msgSplit[0], 64)
 		if err != nil {
-			return answer, errors.Wrap(err, "[IsTwoNumbers]")
+			return "", err
 		}
 		num2, err = strconv.ParseFloat(msgSplit[1], 64)
 		if err != nil {
-			return answer, errors.Wrap(err, "[IsTwoNumbers]")
+			return "", err
 		}
 		switch person[chatId] {
 		case '+':
@@ -126,20 +127,19 @@ func IsTwoNumbers(msg string, chatId int64, person map[int64]rune) (string, erro
 
 func InfoFruits(msg string, config *config.Config) (string, error) {
 	var answer string
-	var fruitInfo *parsers.Nutrit
 	checkPrefFruit, err := regexp.MatchString("apifruit .+", msg)
 	if err != nil {
-		return answer, errors.Wrap(err, "[Regular InfoFruits]")
+		return "", err
 	}
 	if checkPrefFruit {
 		fruit := strings.Split(msg, " ")
-		fruitInfo, err = parsers.ParseFruit(fruit[1], config)
+		fruitInfo, err := parsers.ParseFruit(fruit[1], config)
 		if err != nil {
-			return answer, err
+			return "", err
 		}
 		answer, err = services.AnswerInfoFruits(fruit[2], fruitInfo)
 		if err != nil {
-			return answer, err
+			return "", err
 		}
 	}
 	return answer, nil
@@ -149,12 +149,12 @@ func Btc(msg string, config *config.Config) (string, error) {
 	var answer string
 	checkPrefBtc, err := regexp.MatchString("btc", msg)
 	if err != nil {
-		return answer, errors.Wrap(err, "[Regular Btc]")
+		return "", err
 	}
 	if checkPrefBtc {
 		answer, err = parsers.ParseBtc(config)
 		if err != nil {
-			return answer, err
+			return "", err
 		}
 	}
 	return answer, nil

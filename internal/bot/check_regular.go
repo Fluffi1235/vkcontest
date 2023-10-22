@@ -7,59 +7,93 @@ import (
 	"github.com/Fluffi1235/vkcontest/internal/services"
 )
 
-func (b *Bot) CheckRegular(msg *model.MessageInfoButton, service *services.Repository, persons map[int64]rune, config *config.Config) (bool, error) {
-	if answer, err := DataUser(msg.ButtonData, msg.ButtonInfo.ChatID, service, msg.ButtonInfo.Platform); answer != "" {
+func (b *Bot) CheckRegular(msg *model.MessageInfoButton, service *services.Repository, persons map[int64]rune, config *config.Config) error {
+	var answer string
+
+	answer, err := DataUser(msg.ButtonData, msg.ButtonInfo.ChatID, service, msg.ButtonInfo.Platform)
+	if err != nil {
+		return err
+	}
+	if answer != "" {
 		editMessage := model.NewEditMessage(answer, msg.ButtonInfo.ChatID, msg.ButtonMessageID)
 		err = b.Sources[msg.ButtonInfo.Source].EditMessage(editMessage)
-		return true, err
-	} else if err != nil {
-		return true, err
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	if answer, err := CheckCity(msg.ButtonData, msg.ButtonInfo.ChatID, service); answer != "" {
+
+	answer, err = CheckCity(msg.ButtonData, msg.ButtonInfo.ChatID, service)
+	if err != nil {
+		return err
+	}
+	if answer != "" {
 		editMessage := model.NewEditMessage(answer, msg.ButtonInfo.ChatID, msg.ButtonMessageID)
 		err = b.Sources[msg.ButtonInfo.Source].EditMessage(editMessage)
-		return true, err
-	} else if err != nil {
-		return true, err
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	if arrAnswer, err := WeatherOnNDays(msg.ButtonData, msg.ButtonInfo.ChatID, service); len(arrAnswer) > 0 {
+
+	arrAnswer, err := WeatherOnNDays(msg.ButtonData, msg.ButtonInfo.ChatID, service)
+	if err != nil {
+		return err
+	}
+	if len(arrAnswer) > 0 {
 		for i := 1; i < len(arrAnswer); i++ {
 			if i == 1 {
 				editMessage := model.NewEditMessage(arrAnswer[i], msg.ButtonInfo.ChatID, msg.ButtonMessageID)
 				err = b.Sources[msg.ButtonInfo.Source].EditMessage(editMessage)
+				if err != nil {
+					return err
+				}
 			} else if i > 1 {
 				err = b.Sources[msg.ButtonInfo.Source].Send(arrAnswer[i], msg.ButtonInfo.ChatID)
-			}
-			if err != nil {
-				break
+				if err != nil {
+					return err
+				}
 			}
 		}
-		return true, err
-	} else if err != nil {
-		return true, err
+		return nil
 	}
-	if answerCalc, err := Calculator(msg.ButtonData, msg.ButtonInfo.ChatID, persons); answerCalc && err != nil {
+
+	answerCalc, err := Calculator(msg.ButtonData, msg.ButtonInfo.ChatID, persons)
+	if err != nil {
+		return err
+	}
+	if answerCalc {
 		editMessage := model.NewEditMessage("Введите 2 числа через пробел\nПример: 3 5", msg.ButtonInfo.ChatID, msg.ButtonMessageID)
 		err = b.Sources[msg.ButtonInfo.Source].EditMessage(editMessage)
-		return true, err
-	} else if err != nil {
-		return true, err
+		return nil
 	}
-	if answerCalFruit, err := InfoFruits(msg.ButtonData, config); answerCalFruit != "" {
+
+	answerCalFruit, err := InfoFruits(msg.ButtonData, config)
+	if err != nil {
+		return err
+	}
+	if answerCalFruit != "" {
 		editMessage := model.NewEditMessage(answerCalFruit, msg.ButtonInfo.ChatID, msg.ButtonMessageID)
 		err = b.Sources[msg.ButtonInfo.Source].EditMessage(editMessage)
-		return true, err
-	} else if err != nil {
-		return true, err
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	if answerBTC, err := Btc(msg.ButtonData, config); answerBTC != "" {
+
+	answerBTC, err := Btc(msg.ButtonData, config)
+	if err != nil {
+		return err
+	}
+	if answerBTC != "" {
 		editMessage := model.NewEditMessage(
 			fmt.Sprintf("%s%s%s", "Текущий курс BTC/USD: ", answerBTC, "\n\nДанные были взяты с сайта https://www.coindesk.com/search?s=bitcoin"),
 			msg.ButtonInfo.ChatID, msg.ButtonMessageID)
 		err = b.Sources[msg.ButtonInfo.Source].EditMessage(editMessage)
-		return true, err
-	} else if err != nil {
-		return true, err
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	return false, nil
+	return nil
 }

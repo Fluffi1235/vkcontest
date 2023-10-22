@@ -15,11 +15,16 @@ const (
 )
 
 func (b *Bot) HandlingText(msg *model.MessageInfoText, service *services.Repository, persons map[int64]rune, repo repository.UniversalRepo) error {
-	var err error
-	var answer string
 	message := strings.ToLower(msg.Text)
-	if answer, err = IsTwoNumbers(message, msg.MessageInfo.ChatID, persons); answer != "" {
+	answer, err := IsTwoNumbers(message, msg.MessageInfo.ChatID, persons)
+	if err != nil {
+		return err
+	}
+	if answer != "" {
 		err = b.Sources[msg.MessageInfo.Source].Send(answer, msg.MessageInfo.ChatID)
+		if err != nil {
+			return err
+		}
 	}
 	switch message {
 	case start:
@@ -28,18 +33,33 @@ func (b *Bot) HandlingText(msg *model.MessageInfoText, service *services.Reposit
 			return err
 		}
 		err = b.Sources[msg.MessageInfo.Source].Send(service.AnswerStart(), msg.MessageInfo.ChatID)
+		if err != nil {
+			return err
+		}
 	case begin:
 		err = repo.SetUser(msg)
 		if err != nil {
 			return err
 		}
 		err = b.Sources[msg.MessageInfo.Source].Send(service.AnswerStart(), msg.MessageInfo.ChatID)
+		if err != nil {
+			return err
+		}
 	case info:
 		err = b.Sources[msg.MessageInfo.Source].SendButton("Выберите функцию", msg.MessageInfo.ChatID)
+		if err != nil {
+			return err
+		}
 	case help:
 		err = b.Sources[msg.MessageInfo.Source].Send("Чтобы узнать какие команды есть введите /info", msg.MessageInfo.ChatID)
+		if err != nil {
+			return err
+		}
 	default:
 		err = b.Sources[msg.MessageInfo.Source].Send("Что то пошло не так, попробуйте еще раз /info", msg.MessageInfo.ChatID)
+		if err != nil {
+			return err
+		}
 	}
-	return err
+	return nil
 }

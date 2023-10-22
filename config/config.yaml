@@ -1,6 +1,8 @@
 connectdb: "host=localhost port=5432 user= password= dbname= sslmode=disable"
 tgtoken: ""
 vktoken: ""
-weatherUpdateInfo: 2
+weatherUpdateInfo: 2s
 fruityVice: "https://www.fruityvice.com/api/fruit/"
 coinDesk: "https://api.coindesk.com/v1/bpi/currentprice.json"
+clientTimeout: 5s
+contextTimeout: 3s

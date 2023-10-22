@@ -31,13 +31,13 @@ func main() {
 	repo := repository.New(db)
 	wg := &sync.WaitGroup{}
 
-	go func(wg *sync.WaitGroup) {
+	go func(wg *sync.WaitGroup, cfg *config.Config) {
 		wg.Add(1)
-		err = parsers.New(repo).ParsWeather(cfg.WeatherUpdateInfo, wg)
+		err = parsers.New(repo).ParsWeather(cfg, wg)
 		if err != nil {
 			log.Println(err)
 		}
-	}(wg)
+	}(wg, cfg)
 
 	ctx := context.Background()
 

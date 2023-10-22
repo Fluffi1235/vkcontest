@@ -2,13 +2,12 @@ package repository
 
 import (
 	"github.com/Fluffi1235/vkcontest/internal/model"
-	"github.com/pkg/errors"
 )
 
 func (r Repository) SetUser(messageInfo *model.MessageInfoText) error {
 	rows, err := r.db.Queryx("SELECT chatid, userName, city, firstName, lastName, platform From Users where chatid = $1", messageInfo.MessageInfo.ChatID)
 	if err != nil {
-		return errors.Wrap(err, "[Dao SetUser Select]")
+		return err
 	}
 	if rows.Next() {
 		return nil
@@ -17,7 +16,7 @@ func (r Repository) SetUser(messageInfo *model.MessageInfoText) error {
 	_, err = r.db.Exec(query,
 		messageInfo.MessageInfo.ChatID, messageInfo.UserName, "москва", messageInfo.FirstName, messageInfo.LastName, messageInfo.MessageInfo.Platform)
 	if err != nil {
-		return errors.Wrap(err, "[Dao SetUser Insert]")
+		return err
 	}
 	return nil
 }
@@ -26,7 +25,7 @@ func (r Repository) UpdateCityOfUser(city string, chatId int64) error {
 	query := "UPDATE users set city = $1 where chatId = $2"
 	_, err := r.db.Exec(query, city, chatId)
 	if err != nil {
-		return errors.Wrap(err, "[Dao UpdateCityOfUser Update]")
+		return err
 	}
 	return nil
 }
@@ -36,7 +35,7 @@ func (r Repository) GetUserData(chatId int64, platform string) (*model.User, err
 	query := "SELECT chatId, userName, firstName, lastName, city, platform FROM users where chatid = $1 and platform = $2"
 	err := r.db.Get(userData, query, chatId, platform)
 	if err != nil {
-		return nil, errors.Wrap(err, "[Dao GetUserData Select]")
+		return nil, err
 	}
 	return userData, nil
 }
@@ -46,7 +45,7 @@ func (r Repository) GetCityOfUser(chatId int64) (string, error) {
 	query := "SELECT city FROM users where chatid = $1"
 	err := r.db.Get(userData, query, chatId)
 	if err != nil {
-		return "", errors.Wrap(err, "[Dao GetCityOfUser Select]")
+		return "", err
 	}
 	return userData.City, nil
 }

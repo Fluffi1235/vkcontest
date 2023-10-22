@@ -6,7 +6,6 @@ import (
 	"github.com/Fluffi1235/vkcontest/internal/config"
 	"github.com/pkg/errors"
 	"net/http"
-	"time"
 )
 
 type Fruit struct {
@@ -24,20 +23,22 @@ type Nutrit struct {
 func ParseFruit(msg string, config *config.Config) (*Nutrit, error) {
 	fruit := Fruit{}
 	url := config.FruityViceLink + msg
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	client := http.DefaultClient
+	client.Timeout = config.ClientTimeout
+	ctx, cancel := context.WithTimeout(context.Background(), config.ContextTimeout)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error NewRequestWithContext in ParseBtc")
+		return nil, errors.WithMessagef(err, "Error NewRequestWithContext %s", url)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
-		return nil, errors.WithMessagef(err, "Error connecting to fruityvice, status code error: %d %s\n", resp.StatusCode, resp.Status)
+		return nil, errors.WithMessagef(err, "Error connecting to %s, status code error: %d %s\n", url, resp.StatusCode, resp.Status)
 	}
 	defer resp.Body.Close()
 	err = json.NewDecoder(resp.Body).Decode(&fruit)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error in data mapping ParseFruit")
+		return nil, errors.WithMessagef(err, "Error in data mapping %s", url)
 	}
 	return &fruit.Nutritions, nil
 }

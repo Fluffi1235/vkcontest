@@ -30,7 +30,7 @@ func NewTG(token string) (sources.Source, error) {
 	updates, err := bot.GetUpdatesChan(u)
 	if err != nil {
 		log.Println(err)
-		return nil, errors.Wrap(err, "[tg NewTG]")
+		return nil, err
 	}
 
 	tg := &TG{

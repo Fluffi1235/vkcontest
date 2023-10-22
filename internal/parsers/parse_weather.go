@@ -1,6 +1,8 @@
 package parsers
 
 import (
+	"context"
+	"github.com/Fluffi1235/vkcontest/internal/config"
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
 	"github.com/PuerkitoBio/goquery"
@@ -22,26 +24,32 @@ func New(repo repository.WeatherRepo) *Parser {
 	}
 }
 
-func (p *Parser) ParsWeather(tUpdateWeather int, wg *sync.WaitGroup) error {
+func (p *Parser) ParsWeather(config *config.Config, wg *sync.WaitGroup) error {
 	defer wg.Done()
 	citiesLinks := model.Cities()
-	ticker := time.Tick(time.Duration(tUpdateWeather) * time.Hour)
-	var doc *goquery.Document
-	var resp *http.Response
+	ticker := time.Tick(time.Duration(config.WeatherUpdateInfo) * time.Hour)
+	client := http.DefaultClient
+	client.Timeout = config.ClientTimeout
+	ctx, cancel := context.WithTimeout(context.Background(), config.ContextTimeout)
+	defer cancel()
 	for range ticker {
 		err := p.repo.ClearDb()
 		if err != nil {
-			return errors.Wrap(err, "[ParsWeather]")
+			return err
 		}
-		for key, value := range citiesLinks {
-			resp, err = http.Get(value)
+		for key, url := range citiesLinks {
+			req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 			if err != nil {
-				return errors.WithMessagef(err, "Error connection %s\n in ParsWeather, status code error: %d %s\n", value, resp.StatusCode, resp.Status)
+				return errors.WithMessagef(err, "Error NewRequestWithContext %s", url)
+			}
+			resp, err := client.Do(req)
+			if err != nil {
+				return errors.WithMessagef(err, "Error connecting to %s, status code error: %d %s\n", url, resp.StatusCode, resp.Status)
 			}
 			defer resp.Body.Close()
-			doc, err = goquery.NewDocumentFromReader(resp.Body)
+			doc, err := goquery.NewDocumentFromReader(resp.Body)
 			if err != nil {
-				return errors.Wrap(err, "[ParsWeather]")
+				return errors.WithMessagef(err, "Error in data mapping %s", url)
 			}
 			date := time.Now()
 			var k int

@@ -48,6 +48,7 @@ func (b *Bot) HandlingMessage(msgChanText <-chan *model.MessageInfoText, repo re
 			err := b.HandlingText(msg, service, persons, repo)
 			if err != nil {
 				log.Println(err)
+				return
 			}
 		}(msg, service, persons, repo)
 	}
@@ -61,6 +62,7 @@ func (b *Bot) HandlingButtonMessage(msgChanButton <-chan *model.MessageInfoButto
 			err := b.HandlingButton(msg, service, persons, config)
 			if err != nil {
 				log.Println(err)
+				return
 			}
 		}(msg, service, persons, repo)
 	}

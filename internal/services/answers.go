@@ -5,7 +5,6 @@ import (
 	"github.com/Fluffi1235/vkcontest/internal/model"
 	"github.com/Fluffi1235/vkcontest/internal/parsers"
 	"github.com/Fluffi1235/vkcontest/internal/repository"
-	"github.com/pkg/errors"
 	"log"
 	"strconv"
 	"strings"
@@ -53,13 +52,13 @@ var fruitsTemplate = template.Must(template.New("infoFruit").Parse(tmplInfoFruit
 func (r *Repository) AnswerForCityChange(city string, chatId int64) (string, error) {
 	err := r.repo.UpdateCityOfUser(city, chatId)
 	if err != nil {
-		return "", errors.Wrap(err, "[AnswerForCityChange]")
+		return "", err
 	}
 	var buf bytes.Buffer
 	err = changeCityTemplate.Execute(&buf, city)
 	if err != nil {
 		log.Println(err)
-		return "", errors.Wrap(err, "[AnswerForCityChange]")
+		return "", err
 	}
 	return buf.String(), nil
 }
@@ -69,7 +68,7 @@ func (r *Repository) AnswerUserData(chatId int64, platform string) (string, erro
 	var t *template.Template
 	userData, err := r.repo.GetUserData(chatId, platform)
 	if err != nil {
-		return "", errors.Wrap(err, "[AnswerUserData]")
+		return "", err
 	}
 	userData.City = strings.ToTitle(userData.City)
 	switch userData.Platform {
@@ -80,7 +79,7 @@ func (r *Repository) AnswerUserData(chatId int64, platform string) (string, erro
 	}
 	err = t.Execute(&buf, userData)
 	if err != nil {
-		return "", errors.Wrap(err, "[AnswerUserData]")
+		return "", err
 	}
 	return buf.String(), nil
 }
@@ -89,18 +88,18 @@ func (r *Repository) AnswerWeatherByNDays(limit string, chatId int64) ([]string,
 	var counter int
 	var answersForDay string
 	var buf bytes.Buffer
-	arrAnswer := make([]string, 1)
+	var arrAnswer []string
 	amountDays, err := strconv.Atoi(limit)
 	if err != nil {
-		return nil, errors.Wrap(err, "[AnswerWeatherByNDays]")
+		return nil, err
 	}
 	userCity, err := r.repo.GetCityOfUser(chatId)
 	if err != nil {
-		return nil, errors.Wrap(err, "[AnswerWeatherByNDays]")
+		return nil, err
 	}
 	weather, err := r.repo.GetWeatherByNDays(amountDays, userCity)
 	if err != nil {
-		return nil, errors.Wrap(err, "[AnswerWeatherByNDays]")
+		return nil, err
 	}
 	for i := 0; i < len(weather); i++ {
 		dayFormat := weather[i].Data.Format("2006-01-02")
@@ -111,7 +110,7 @@ func (r *Repository) AnswerWeatherByNDays(limit string, chatId int64) ([]string,
 			}
 			err = weatherTemplate.Execute(&buf, weather[i])
 			if err != nil {
-				return nil, errors.Wrap(err, "[AnswerWeatherByNDays]")
+				return nil, err
 			}
 			answersForDay += buf.String()
 			counter++
@@ -135,7 +134,7 @@ func AnswerInfoFruits(fruit string, fruitInfo *parsers.Nutrit) (string, error) {
 	var buf bytes.Buffer
 	err := fruitsTemplate.Execute(&buf, infoFruit)
 	if err != nil {
-		return "", errors.Wrap(err, "[AnswerInfoFruits]")
+		return "", err
 	}
 	return buf.String(), nil
 }
